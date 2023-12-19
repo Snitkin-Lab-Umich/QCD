@@ -1,0 +1,15 @@
+{
+    "__default__": 
+    {
+     "account": "esnitkin1",
+     "partition": "standard",
+     "nodes": 1,
+     "procs": 36,
+     "pmem": "5GB",
+     "walltime": "96:00:00",
+     "email": "apirani@umich.edu",
+     "mail_type": "FAIL",
+     "output": "logs/cluster/{rule}.{wildcards}.out",
+     "error": "logs/cluster/{rule}.{wildcards}.err"
+    }
+}

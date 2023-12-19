@@ -1,0 +1,11 @@
+#!/bin/sh
+#SBATCH --job-name=QCD
+#SBATCH --mail-user=apirani@med.umich.edu
+#SBATCH --mail-type=FAIL,REQUEUE
+#SBATCH --export=ALL
+#SBATCH --partition=standard
+#SBATCH --account=esnitkin99
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=16 --mem=80g --time=250:00:00
+
+cd /nfs/turbo/umms-esnitkin/Github/QCD_SMAKE/QCD_SMAKE
+snakemake -p --use-conda -j 999 --cluster-config config/cluster.json --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda

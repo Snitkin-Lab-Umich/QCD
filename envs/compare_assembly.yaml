@@ -1,0 +1,8 @@
+name: compare_assembly
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - edlib
+  - mappy

@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - picard
+  - samtools
+prefix: /nfs/turbo/umms-esnitkin/Project_UTI_PTR/Analysis/2023-06-23_Growth_Rate_Analysis/Growth-rate-estimate_SMAKE/.snakemake/conda/picard
