@@ -122,6 +122,7 @@ rule all:
         amrfinder = expand("results/{prefix}/{sample}/amrfinder/{sample}_amrfinder.tsv", sample=SAMPLE, prefix=PREFIX),
         mlst_report = expand("results/{prefix}/{sample}/mlst/report.tsv", sample=SAMPLE, prefix=PREFIX),
         kraken_report = expand("results/{prefix}/{sample}/kraken/{sample}_kraken_report.tsv", sample=SAMPLE, prefix=PREFIX),
+        skani_ref_genome_results = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", sample=SAMPLE, prefix=PREFIX)
 
 rule coverage:
     input:
@@ -370,6 +371,19 @@ rule busco:
         "envs/busco.yaml"
     shell:
         "busco -f -i {input.spades_l1000_assembly} -m genome -l bacteria_odb10 -o {params.outdir}"
+
+rule skani:
+    input:
+        spades_contigs_file = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta")
+    output:
+        skani_output = f"results/{{prefix}}/{{sample}}/skani/{{sample}}_skani_output.txt"
+    params:
+        skani_ani_db = config["skani_db"],
+        threads = 10
+    conda:
+        "envs/skani.yaml"
+    shell:
+        "skani search {input.spades_contigs_file} -d {params.skani_ani_db} -o {output.skani_output} -t {params.threads}"
         
 rule multiqc:
     input:

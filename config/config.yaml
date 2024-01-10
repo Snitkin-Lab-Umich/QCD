@@ -42,3 +42,6 @@ max_contigs: 500
 assembly_length: 7000000
 coverage: 20
 kraken_host: Homosapiens
+
+#skani
+skani_db: /nfs/turbo/umms-esnitkin/database/skani/gtdb_skani_database_ani

@@ -7,6 +7,7 @@ import json
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import re
 
 samples_df = pd.read_csv(config["samples"])
 SAMPLE = list(samples_df['sample_id'])
@@ -100,6 +101,37 @@ def kraken_report(prefix, outdir):
 
     os.system("bash %s/kraken_summary.sh" % report_script_dir)
 
+def skani_report(outdir, prefix):
+    prefix = prefix.pop()
+    outdir = "results/%s" % prefix
+    report_dir = str(outdir) + "/%s_Report" % prefix
+    report_data_dir = report_dir + "/data"
+
+    result_df = pd.DataFrame(columns=['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']) # Create an empty DataFrame to store the results
+
+    for root, samples, skani_files in os.walk(outdir): # Iterate over samples in the results/prefix directory
+        for sample_name in samples:
+            skani_file_path = os.path.join(root, sample_name, 'skani', f'{sample_name}_skani_output.txt')
+
+            if os.path.exists(skani_file_path): # Check if the skani file exists
+                skani_file = pd.read_csv(skani_file_path, sep='\t| ,', skipinitialspace=True, header=0, engine='python') # Read the skani file
+                first_row_df = skani_file[['ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']].iloc[:1] # Extract the first row from specific columns
+
+                if first_row_df.empty: # Check if the first row is empty
+                    first_row_df = pd.DataFrame({'Sample': [sample_name], # Create a DataFrame with NaN values and add the sample name
+                                                'ANI': ["NAs"],
+                                                'Align_fraction_ref': ["NAs"],
+                                                'Align_fraction_query': ["NAs"],
+                                                'Ref_name': ["NAs"]})
+                else:
+                    first_row_df.loc[:, 'Sample'] = sample_name  # Add a new column for the sample name
+
+                first_row_df = first_row_df[['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']] # Reorder the columns
+                result_df = pd.concat([result_df, first_row_df], ignore_index=True) # Concatenate the result to the overall DataFrame
+    
+    result_file_path = os.path.join(report_data_dir, '%s_Skani_report_final.csv' % prefix) # Save the final result to CSV files in the output directory
+    result_df.to_csv(result_file_path, index=False)
+
 def summary(prefix, outdir):
     prefix = prefix.pop()
     outdir = outdir.pop()
@@ -149,6 +181,9 @@ def summary(prefix, outdir):
     contig_distribution['Total # of contigs'] = contig_distribution.sum(axis=1, numeric_only=True)
     contig_distribution = contig_distribution[['Sample', 'Total # of contigs']]
 
+    #read final skani output file
+    skani_summary = pd.read_csv("results/%s/%s_Report/data/%s_Skani_report_final.csv" % (prefix, prefix, prefix), sep=',', skipinitialspace=True, header=0, engine='python')
+
     QC_summary_temp1 = pd.merge(Coverage, mlst, on=["Sample", "Sample"],  how='left')
     QC_summary_temp2 = pd.merge(QC_summary_temp1, kraken, on=["Sample", "Sample"],  how='left')
     QC_summary_temp3 = pd.merge(QC_summary_temp2, raw_multiqc_fastqc_summary, on=["Sample", "Sample"], how='left')
@@ -156,7 +191,7 @@ def summary(prefix, outdir):
     QC_summary_temp5 = pd.merge(QC_summary_temp4, multiqc_quast, on=["Sample", "Sample"], how='left')
     QC_summary_temp6 = pd.merge(QC_summary_temp5, contig_distribution, on=["Sample", "Sample"], how='left')
     
-    QC_summary_temp7 = QC_summary_temp6[["Sample" , "Total_reads" , "Total_bp" , "MeanReadLength" , "Coverage" , "Scheme" , "ST" , "PercentageofreadsforSpecies" , "#ofreadsforSpecies" , "Species" , "After_trim_per_base_sequence_content" , "After_trim_overrepresented_sequences" , "After_trim_%GC" , "After_trim_Total Bases" , "After_trim_Total Sequences" , "After_trim_median_sequence_length" , "After_trim_avg_sequence_length" , "After_trim_total_deduplicated_percentage" , "After_trim_Sequence length" , "After_trim_adapter_content" , "N50" , "Total length" , "Total # of contigs"]]
+    QC_summary_temp7 = QC_summary_temp6[["Sample" , "Total_reads" , "Total_bp" , "MeanReadLength" , "Coverage" , "Scheme" , "ST" , "PercentageofreadsforSpecies" , "#ofreadsforSpecies" , "Species" , "After_trim_per_base_sequence_content" , "After_trim_overrepresented_sequences" , "After_trim_%GC" , "After_trim_Total Bases" , "After_trim_Total Sequences" , "After_trim_median_sequence_length" , "After_trim_avg_sequence_length" , "After_trim_total_deduplicated_percentage" , "After_trim_Sequence length" , "After_trim_adapter_content" , "N50" , "Total length" , "Total # of contigs"]].copy() #.copy() to deal with SettingWithCopyWarning error
 
     QC_check_condition = [
     (QC_summary_temp7['Total # of contigs'] > config["max_contigs"]),
@@ -170,7 +205,9 @@ def summary(prefix, outdir):
 
     QC_summary_temp7['QC Check'] = np.select(QC_check_condition, status)
 
-    QC_summary_temp7.to_csv('results/%s/%s_Report/data/%s_QC_summary.csv' % (prefix, prefix, prefix), index=False)
+    QC_summary_temp8 = pd.merge(QC_summary_temp7, skani_summary, on=["Sample", "Sample"], how='left') # Merge skani df into the existing DataFrame
+
+    QC_summary_temp8.to_csv('results/%s/%s_Report/data/%s_QC_summary.csv' % (prefix, prefix, prefix), index=False)
 
 def plot(prefix, outdir):
     prefix = prefix.pop()
@@ -236,10 +273,11 @@ rule all:
     input:
         coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
         kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
-        mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
+        skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
         multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
+        mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
         QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
-        QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX),
+        QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX)
 
 rule coverage_report:
     input:
@@ -274,6 +312,16 @@ rule kraken_report:
     run:
         kraken_report({params.prefix}, {input.outdir})
 
+rule skani_report:
+    input:
+        outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
+    output:
+        skani_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Skani_report_final.csv",
+    params:
+        prefix = "{prefix}",
+    run:
+        skani_report({input.outdir}, {params.prefix})
+
 rule multiqc:
     input:
         inputdir = lambda wildcards: expand(f"results/{wildcards.prefix}"),
@@ -307,6 +355,7 @@ rule Summary:
         coverage = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Final_Coverage.txt"),
         kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
         mlst = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_MLST_results.csv"),
+        skani_report = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Skani_report_final.csv")
     output:
         QC_summary_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_QC_summary.csv",
     params:

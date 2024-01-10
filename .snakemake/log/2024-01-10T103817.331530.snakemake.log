@@ -1,0 +1,3 @@
+KeyError in line 226 of /gpfs/accounts/esnitkin_root/esnitkin1/dhatrib/QCD/QCD.smk:
+'ariba_mlst_db'
+  File "/gpfs/accounts/esnitkin_root/esnitkin1/dhatrib/QCD/QCD.smk", line 226, in <module>
