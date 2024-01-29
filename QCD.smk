@@ -286,7 +286,7 @@ rule assembly:
     conda:
         "envs/spades.yaml"
     shell:
-        "spades.py --careful --sc --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir}"
+        "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir}"
 
 rule bioawk:
     input:
