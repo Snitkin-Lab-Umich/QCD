@@ -7,7 +7,7 @@ QCD is a smakemake worflow for microbial illumina sequencing quality control and
 > Clone the github directory onto your system.
 
 ```
-git clone https://github.com/alipirani88/QCD_SMAKE.git
+git clone https://github.com/Snitkin-Lab-Umich/QCD.git
 
 ```
 > Create QCD conda environment
