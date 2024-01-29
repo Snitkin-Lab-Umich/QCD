@@ -355,7 +355,7 @@ rule amrfinder:
     conda:
         "envs/amrfinder.yaml"
     shell:
-        "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly}"
+        "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly} -O {params.organism}"
         
 
 rule busco:
