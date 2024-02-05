@@ -5,7 +5,6 @@
 #SBATCH --export=ALL
 #SBATCH --partition=standard
 #SBATCH --account=esnitkin99
-#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=16 --mem=80g --time=250:00:00
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=2 --mem=10g --time=250:00:00
 
-cd /nfs/turbo/umms-esnitkin/Github/QCD_SMAKE/QCD_SMAKE
-snakemake -p --use-conda -j 999 --cluster-config config/cluster.json --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda
+snakemake -s QCD.smk -p --use-conda -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 10000
