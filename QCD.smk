@@ -14,7 +14,6 @@ SHORTREADS = list(samples_df['sample_id'])
 if not os.path.exists("results/" + PREFIX):
     os.system("mkdir %s" % "results/" + PREFIX)
 
-
 def downsample_reads(file, file2, out1, out2, genome_size):
     file = file.pop()
     file2 = file2.pop()
@@ -37,7 +36,6 @@ def downsample_reads(file, file2, out1, out2, genome_size):
         print('Error running seqtk for extracting fastq statistics.')
         sys.exit(1)
 
-
     with open("%s_fastqchk.txt" % file, 'rU') as file_open:
         for line in file_open:
             if line.startswith('min_len'):
@@ -49,7 +47,6 @@ def downsample_reads(file, file2, out1, out2, genome_size):
                 line_split = line.split('\t')
                 total_bases = int(line_split[1]) * 2
     file_open.close()
-
 
     print('Average Read Length: %s' % avg_len)
 
@@ -101,10 +98,6 @@ def downsample_reads(file, file2, out1, out2, genome_size):
         r2_sub = file2
         os.system("cp %s %s" % (file, out1))
         os.system("cp %s %s" % (file2, out2))
-        
-
-    # # return r1_sub, r2_sub, seqtk_downsample
-
 
 rule all:
     input:
@@ -315,7 +308,6 @@ rule prokka:
     shell:
         "prokka -outdir {params.outdir} --strain {params.prefix} --prefix {params.prefix} {params.prokka_params} {input.spades_l1000_assembly}"
 
-
 rule quast:
     input:
         spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
@@ -355,7 +347,6 @@ rule amrfinder:
         "envs/amrfinder.yaml"
     shell:
         "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly} -O {params.organism}"
-        
 
 rule busco:
     input:
