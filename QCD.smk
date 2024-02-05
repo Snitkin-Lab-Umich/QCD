@@ -190,53 +190,6 @@ rule quality_aftertrim:
     shell:
         "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
 
-rule ariba_card:
-    input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
-
-    output:
-        ariba_report = f"results/{{prefix}}/{{sample}}/ariba_card/report.tsv",
-    params:
-        card_db = config["ariba_card_db"],
-        threads = config["ncores"],
-        outdir = "results/{prefix}/{sample}/ariba_card/"
-    conda:
-        "envs/ariba.yaml"
-    shell:
-        "ariba run --verbose --force {params.card_db} {input.r1} {input.r2} {params.outdir} --tmp_dir /tmp/"
-
-rule ariba_mlst:
-    input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
-
-    output:
-        ariba_mlstreport = f"results/{{prefix}}/{{sample}}/ariba_mlst/mlst_report.tsv",
-    params:
-        mlst_db = config["ariba_mlst_db"],
-        threads = config["ncores"],
-        outdir = "results/{prefix}/{sample}/ariba_mlst/"
-    conda:
-        "envs/ariba.yaml"
-    shell:
-        "ariba run --verbose --force {params.mlst_db} {input.r1} {input.r2} {params.outdir} --tmp_dir /tmp/"
-
-# Deprecated - Removing Ariba support
-rule ariba_summary:
-    input:
-        ariba_cardreport = lambda wildcards: expand(f"results/{wildcards.prefix}/*/ariba_card/report.tsv"),
-    output:
-        ariba_cardsummary = f"results/{{prefix}}/Ariba_Card_Minimal_Summary.csv",
-    
-    params:
-        prefix = "results/{prefix}/{prefix}_Ariba_Card_Minimal_Summary",
-        threads = config["ncores"],
-    conda:
-        "envs/ariba.yaml"
-    shell:
-        "ariba summary {params.prefix} {input.ariba_cardreport} > {output.ariba_cardsummary}"
-
 rule downsample:
     input:
         r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
