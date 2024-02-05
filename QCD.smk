@@ -11,6 +11,9 @@ PREFIX = config["prefix"]
 
 SHORTREADS = list(samples_df['sample_id'])
 
+if not os.path.exists("results/"):
+    os.system("mkdir %s" % "results/")
+
 if not os.path.exists("results/" + PREFIX):
     os.system("mkdir %s" % "results/" + PREFIX)
 
