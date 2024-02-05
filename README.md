@@ -10,21 +10,29 @@ QCD is a smakemake worflow for microbial illumina sequencing quality control and
 git clone https://github.com/Snitkin-Lab-Umich/QCD.git
 
 ```
-> Create QCD conda environment
+> Load snakemake module from Great Lakes modules
 
 ```
-conda env create -f QCD.yaml -n QCD
+module load snakemake
 ```
 
-> Change snakemake configuration settings in config/config.yaml file and create a new sample list file - sample_test.tsv
+> Customise snakemake configuration settings in config/config.yaml file as per your needs and create a sample list file for your project - sample.tsv
 
 
 ## Quick start
 
 ### Run QCD on a set of samples.
 
+Run QCD locally
+
 ```
-snakemake -s QCD.smk -p --use-conda -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000
+snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
+```
+
+Run QCD on Great lakes HPC
+
+```
+snakemake -s QCD.smk -p --use-conda -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 10000
 ```
 
 ![Alt text](./QCD_dag.svg)
@@ -38,7 +46,7 @@ snakemake -s QCD_report.smk -p --configfile config/config.yaml --cores all
 ## Dependencies
 
 ### Near Essential
-* [Snakemake>6.15.5](https://snakemake.readthedocs.io/en/stable/#)
+* [Snakemake>=7.32.4](https://snakemake.readthedocs.io/en/stable/#)
 * [Conda](https://docs.conda.io/en/latest/)
 
 All the necessary software stack required for the workflow will be installed using conda package manager.
