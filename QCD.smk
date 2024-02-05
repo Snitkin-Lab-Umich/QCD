@@ -112,8 +112,6 @@ rule all:
         fastqc_raw = expand("results/{prefix}/{sample}/quality_raw/{sample}_Forward/{sample}_R1_fastqc.html", sample=SAMPLE, prefix=PREFIX),
         trim = expand("results/{prefix}/{sample}/trimmomatic/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
         fastqc_aftertrim = expand("results/{prefix}/{sample}/quality_aftertrim/{sample}_Forward/{sample}_R1_trim_paired_fastqc.html", sample=SAMPLE, prefix=PREFIX),
-        #ariba_report = expand("results/{prefix}/{sample}/ariba_card/report.tsv", sample=SAMPLE, prefix=PREFIX),
-        #ariba_mlst_report = expand("results/{prefix}/{sample}/ariba_mlst/mlst_report.tsv", sample=SAMPLE, prefix=PREFIX),
         downsample_read = expand("results/{prefix}/{sample}/downsample/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
         spades_assembly = expand("results/{prefix}/{sample}/spades/contigs.fasta", sample=SAMPLE, prefix=PREFIX),
         spades_l1000_assembly = expand("results/{prefix}/{sample}/spades/{sample}_contigs_l1000.fasta", sample=SAMPLE, prefix=PREFIX),
@@ -231,6 +229,7 @@ rule ariba_mlst:
     shell:
         "ariba run --verbose --force {params.mlst_db} {input.r1} {input.r2} {params.outdir} --tmp_dir /tmp/"
 
+# Deprecated - Removing Ariba support
 rule ariba_summary:
     input:
         ariba_cardreport = lambda wildcards: expand(f"results/{wildcards.prefix}/*/ariba_card/report.tsv"),
