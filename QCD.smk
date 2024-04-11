@@ -325,7 +325,7 @@ rule skani:
         skani_output = f"results/{{prefix}}/{{sample}}/skani/{{sample}}_skani_output.txt"
     params:
         skani_ani_db = config["skani_db"],
-        threads = 10
+        threads = 4
     conda:
         "envs/skani.yaml"
     shell:
