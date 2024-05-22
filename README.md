@@ -1,5 +1,7 @@
 # QCD - Quality Control and Contamination Detection workflow.
 
+## Summary
+
 QCD is a workflow for microbial Illumina sequencing quality control and contamination detection implemented in Snakemake. As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), this pipeline should be run on raw sequencing data as soon as the data is available from the sequencing core department. 
 
 In short, it performs the following steps:
