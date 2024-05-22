@@ -126,8 +126,10 @@ rule coverage:
         coverage = f"results/{{prefix}}/{{sample}}/raw_coverage/{{sample}}_coverage.json",
     params:
         size=config["genome_size"]
-    conda:
-        "envs/fastq-scan.yaml"
+    #conda:
+    #    "envs/fastq-scan.yaml"
+    singularity:
+        "docker://staphb/fastq-scan:1.0.1"
     shell:
         "zcat {input.r1} {input.r2} | fastq-scan -g {params.size} > {output.coverage}"
 
@@ -142,8 +144,10 @@ rule quality_raw:
         "logs/{prefix}/{sample}/quality_raw/{sample}.log"
     params:
         outdir="results/{prefix}/{sample}/quality_raw/{sample}"
-    conda:
-        "envs/fastqc.yaml"
+    #conda:
+    #    "envs/fastqc.yaml"
+    singularity:
+        "docker://staphb/fastqc:0.12.1"
     shell:
         "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
 
@@ -172,8 +176,10 @@ rule trimmomatic_pe:
         threads = config["ncores"],
     log:
         "logs/{prefix}/{sample}/trimmomatic/{sample}.log"
-    conda:
-        "envs/trimmomatic.yaml"
+    #conda:
+        #"envs/trimmomatic.yaml"
+    singularity:
+        "docker://staphb/trimmomatic:0.39"
     shell:
         "trimmomatic PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} {output.r2} {output.r2_unpaired} -threads {params.threads} ILLUMINACLIP:{params.adapter_filepath}:{params.seed}:{params.palindrome_clip}:{params.simple_clip}:{params.minadapterlength}:{params.keep_both_reads} SLIDINGWINDOW:{params.window_size}:{params.window_size_quality} MINLEN:{params.minlength} HEADCROP:{params.headcrop_length} &>{log}"
 
@@ -188,8 +194,10 @@ rule quality_aftertrim:
         "logs/{prefix}/{sample}/quality_aftertrim/{sample}.log"
     params:
         outdir="results/{prefix}/{sample}/quality_aftertrim/{sample}"
-    conda:
-        "envs/fastqc.yaml"
+    #conda:
+    #    "envs/fastqc.yaml"
+    singularity:
+        "docker://staphb/fastqc:0.12.1"
     shell:
         "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
 
@@ -217,8 +225,10 @@ rule kraken:
         db = config["kraken_db"],
         threads = 12
         # threads = config["threads"]
-    conda:
-        "envs/kraken.yaml"
+    #conda:
+    #    "envs/kraken.yaml"
+    singularity:
+        "docker://staphb/kraken2:2.1.3"
     shell:
         "kraken2 --db {params.db} --threads {params.threads} --paired --gzip-compressed --quick --output {output.kraken_out} --report {output.kraken_report} {input.r1} {input.r2}"
 
@@ -231,8 +241,10 @@ rule assembly:
     params:
         out_dir = "results/{prefix}/{sample}/spades/",
         db = config["kraken_db"],
-    conda:
-        "envs/spades.yaml"
+    #conda:
+    #    "envs/spades.yaml"
+    singularity:
+        "docker://staphb/spades:3.15.5"
     shell:
         "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir}"
 
@@ -259,8 +271,10 @@ rule prokka:
         prokka_params = config["prokka"],
         outdir = "results/{prefix}/{sample}/prokka",
         prefix = "{sample}",
-    conda:
-        "envs/prokka.yaml"
+    #conda:
+    #    "envs/prokka.yaml"
+    singularity:
+        "docker://staphb/prokka:1.14.6"
     shell:
         "prokka -outdir {params.outdir} --strain {params.prefix} --prefix {params.prefix} {params.prokka_params} {input.spades_l1000_assembly}"
 
@@ -272,8 +286,10 @@ rule quast:
     params: 
         outdir = "results/{prefix}/{sample}/quast",
         prefix = "{sample}",
-    conda:
-        "envs/quast.yaml"
+    #conda:
+    #    "envs/quast.yaml"
+    singularity:
+        "docker://staphb/quast:5.0.2"
     shell:
         "quast.py {input.spades_l1000_assembly} -o {params.outdir} --contig-thresholds 0,1000,5000,10000,25000,50000"
 
@@ -285,8 +301,10 @@ rule mlst:
     params: 
         outdir = "results/{prefix}/{sample}/mlst",
         prefix = "{sample}",
-    conda:
-        "envs/mlst.yaml"
+    #conda:
+    #    "envs/mlst.yaml"
+    singularity:
+        "docker://staphb/mlst:latest"
     shell:
         "mlst {input.spades_l1000_assembly} > {output.mlst_report}"
 
@@ -299,8 +317,10 @@ rule amrfinder:
         outdir = "results/{prefix}/{sample}/amrfinder",
         prefix = "{sample}",
         organism = config['amrfinder_organism']
-    conda:
-        "envs/amrfinder.yaml"
+    #conda:
+    #    "envs/amrfinder.yaml"
+    singularity:
+        "docker://staphb/ncbi-amrfinderplus:latest"
     shell:
         "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly} -O {params.organism}"
 
@@ -313,8 +333,10 @@ rule busco:
         outdir = "results/{prefix}/{sample}/busco",
         prefix = "{sample}",
         threads = config["ncores"],
-    conda:
-        "envs/busco.yaml"
+    #conda:
+    #    "envs/busco.yaml"
+    singularity:
+        "docker://staphb/busci:latest"
     shell:
         "busco -f -i {input.spades_l1000_assembly} -m genome -l bacteria_odb10 -o {params.outdir}"
 
@@ -326,8 +348,10 @@ rule skani:
     params:
         skani_ani_db = config["skani_db"],
         threads = 4
-    conda:
-        "envs/skani.yaml"
+    #conda:
+    #    "envs/skani.yaml"
+    singularity:
+        "docker://staphb/skani:0.2.1"
     shell:
         "skani search {input.spades_contigs_file} -d {params.skani_ani_db} -o {output.skani_output} -t {params.threads}"
         
@@ -349,8 +373,10 @@ rule multiqc:
         resultsoutdir = "results/{prefix}",
         outdir = "results/{prefix}/multiqc",
         prefix = "{prefix}",
-    conda:
-        "envs/multiqc.yaml"
+    #conda:
+    #    "envs/multiqc.yaml"
+    singularity:
+        "docker://staphb/multiqc:1.19"
     shell:
         "multiqc -f --outdir {params.outdir} -n {params.prefix}_QC_report -i {params.prefix}_QC_report {params.resultsoutdir}"
         
