@@ -1,8 +1,10 @@
 # QCD - Quality Control and Contamination Detection workflow.
 
-## Summary
+QCD is a workflow for microbial Illumina sequencing quality control and contamination detection implemented in Snakemake.
 
-QCD is a workflow for microbial Illumina sequencing quality control and contamination detection implemented in Snakemake. As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), this pipeline should be run on raw sequencing data as soon as the data is available from the sequencing core department. 
+### Summary
+
+As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), this pipeline should be run on raw sequencing data as soon as the data is available from the sequencing core department. 
 
 In short, it performs the following steps:
 
@@ -39,12 +41,22 @@ results/2024-05-21_QCD_Project_MDHHS/
 > Clone the github directory onto your system.
 
 ```
+
 git clone https://github.com/Snitkin-Lab-Umich/QCD.git
-```
-> Load snakemake module from Great Lakes modules
 
 ```
+> Load Bioinformatics, snakemake and singularity modules from Great Lakes modules.
+
+```
+
+module load Bioinformatics
+
+```
+
+```
+
 module load snakemake singularity
+
 ```
 
 
@@ -66,6 +78,7 @@ Add samples to `config/sample.tsv` following the explanation provided below. `sa
 You can create sample.tsv file using the following for loop. Replace *{path_to_your_raw_reads}* below with the actual path to your raw sequencing reads.
 
 ```
+
 echo "sample_id,illumina_r1" > config/sample.tsv
 
 for read1 in {path_to_your_raw_reads}/*_R1.fastq.gz; do
@@ -73,6 +86,7 @@ for read1 in {path_to_your_raw_reads}/*_R1.fastq.gz; do
     read1_basename=$(basename $read1)
     echo $sample_id,$read1_basename
 done >> config/sample.tsv
+
 ```
 
 ## Quick start
@@ -88,14 +102,18 @@ snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
 Run QCD on Great lakes HPC
 
 ```
+
 snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 10000
+
 ```
 
 ![Alt text](./QCD_dag.svg)
 
 ### Gather Summary files and generate a report. 
 ```
+
 snakemake -s QCD_report.smk -p --configfile config/config.yaml --cores all
+
 ```
 ![Alt text](./QCD_report_dag.svg)
 
