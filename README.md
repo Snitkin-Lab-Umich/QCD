@@ -45,6 +45,15 @@ results/2024-05-21_QCD_Project_MDHHS/
 git clone https://github.com/Snitkin-Lab-Umich/QCD.git
 
 ```
+
+> Ensure you have successfully cloned QCD. Type `ls` and you should see the newly created directory **_QCD_**. Move to the newly created directory.
+
+```
+
+cd QCD
+
+```
+
 > Load Bioinformatics, snakemake and singularity modules from Great Lakes modules.
 
 ```
