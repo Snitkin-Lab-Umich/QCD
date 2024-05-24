@@ -74,6 +74,8 @@ This workflow makes use of singularity containers available through [State Publi
 
 ## Setup config and samples files
 
+**_If you are testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
+
 ### Config
 As an input, the snakemake file takes a config file where you can set the path to `sample.tsv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
 
@@ -84,13 +86,13 @@ Add samples to `config/sample.tsv` following the explanation provided below. `sa
 
 * `illumina_r1` is the name of the entire raw FASTQ file. In the same directory,  if your file is called `Rush_KPC_110_R1.fastq.gz`, your sample_id would be `Rush_KPC_110_R1.fastq.gz`. **_Only include forward reads._**
 
-You can create sample.tsv file using the following for loop. Replace *{path_to_your_raw_reads}* below with the actual path to your raw sequencing reads.
+You can create sample.tsv file using the following for loop. Replace *path_to_your_raw_reads* below with the actual path to your raw sequencing reads.
 
 ```
 
 echo "sample_id,illumina_r1" > config/sample.tsv
 
-for read1 in {path_to_your_raw_reads}/*_R1.fastq.gz; do
+for read1 in path_to_your_raw_reads/*_R1.fastq.gz; do
     sample_id=$(basename $read1 | sed 's/_R1.fastq.gz//g')
     read1_basename=$(basename $read1)
     echo $sample_id,$read1_basename
@@ -102,6 +104,14 @@ done >> config/sample.tsv
 
 ### Run QCD on a set of samples.
 
+> Preview the steps in QCD by performing a dryrun of the pipeline. 
+
+```
+
+snakemake -s QCD.smk --dryrun -p
+
+```
+
 Run QCD locally
 
 ```
@@ -112,16 +122,26 @@ Run QCD on Great lakes HPC
 
 ```
 
-snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 10000
+snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 1000
 
 ```
 
 ![Alt text](./QCD_dag.svg)
 
 ### Gather Summary files and generate a report. 
+
+> Preview the steps in QCD report by performing a dryrun of the pipeline. 
+
 ```
 
-snakemake -s QCD_report.smk -p --configfile config/config.yaml --cores all
+snakemake -s QCD_report.smk --dryrun -p
+
+```
+> Run QCD report on Great lakes HPC
+
+```
+
+snakemake -s QCD_report.smk -p --use-singularity --cores all
 
 ```
 ![Alt text](./QCD_report_dag.svg)
