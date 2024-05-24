@@ -297,8 +297,10 @@ rule amr_report:
     params:
         prefix = "{prefix}",
         phandango = "--no_tree"
-    conda:
-        "envs/ariba.yaml"
+    #conda:
+    #    "envs/ariba.yaml"
+    singularity:
+        "docker://staphb/ariba:2.14.7"
     shell:
         "ariba summary --preset minimal {params.phandango} {input.outdir}/report/{params.prefix}_AMR_minimal_report {input.outdir}/*/ariba_card/report.tsv && ariba summary --preset all {params.phandango} {input.outdir}/report/{params.prefix}_AMR_all_report {input.outdir}/*/ariba_card/report.tsv"
 
@@ -333,8 +335,10 @@ rule multiqc:
     params:
         outdir = "results/{prefix}/{prefix}_Report",
         prefix = "{prefix}",
-    conda:
-        "envs/multiqc.yaml"
+    #conda:
+    #    "envs/multiqc.yaml"
+    singularity:
+        "docker://staphb/multiqc:1.19"
     shell:
         "multiqc -f --export --outdir {params.outdir}/multiqc -n {params.prefix}_QC_report -i {params.prefix}_QC_report {input.inputdir}/*/quality_aftertrim/*_Forward {input.inputdir}/*/kraken {input.inputdir}/*/prokka {input.inputdir}/*/quast"
 
