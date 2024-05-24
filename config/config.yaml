@@ -47,6 +47,12 @@ prokka: -kingdom Bacteria --force --rfam
 # https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus#--organism-option
 amrfinder_organism: Klebsiella_pneumoniae
 
+# QC thresholds 
+min_contigs: 10
+max_contigs: 500
+assembly_length: 7000000
+coverage: 20
+
 # Skani database
 # Optional to change this unless you have a skani database of your own
 skani_db: /nfs/turbo/umms-esnitkin/database/skani/gtdb_skani_database_ani
