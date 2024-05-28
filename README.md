@@ -74,7 +74,7 @@ This workflow makes use of singularity containers available through [State Publi
 
 ## Setup config and samples files
 
-**_If you are testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
+**_If you are just testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
 
 ### Config
 As an input, the snakemake file takes a config file where you can set the path to `sample.tsv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
@@ -112,13 +112,15 @@ snakemake -s QCD.smk --dryrun -p
 
 ```
 
-Run QCD locally
+> Run QCD locally
 
 ```
+
 snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
+
 ```
 
-Run QCD on Great lakes HPC
+>Run QCD on Great lakes HPC
 
 ```
 
