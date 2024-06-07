@@ -38,7 +38,16 @@ results/2024-05-21_QCD_Project_MDHHS/
 
 ## Installation 
 
-> Clone the github directory onto your system.
+
+> If you are using Great Lakes HPC, ensure you are cloning the repository in your scratch directory. Change `your_uniqname` to your uniqname. 
+
+```
+
+cd /scratch/esnitkin_root/esnitkin1/your_uniqname/
+
+```
+
+> Clone the github directory onto your system. 
 
 ```
 
@@ -72,7 +81,7 @@ module load snakemake singularity
 This workflow makes use of singularity containers available through [State Public Health Bioinformatics group](https://github.com/StaPH-B/docker-builds). If you are working on Great Lakes (umich cluster)—you can load snakemake and singularity modules as shown above. However, if you are running it on your local or other computing platform, ensure you have snakemake and singularity installed.
 
 
-## Setup config and samples files
+## Setup config, samples and cluster files
 
 **_If you are just testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
 
@@ -100,6 +109,10 @@ done >> config/sample.tsv
 
 ```
 
+### Cluster file
+
+Reduce the walltime (to ~6 hours) in `config/cluster_kraken.json` to ensure the jobs are being submitted in a timely manner. 
+
 ## Quick start
 
 ### Run QCD on a set of samples.
@@ -124,13 +137,21 @@ snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
 
 ```
 
-snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 1000
+snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
 
 ![Alt text](./QCD_dag.svg)
 
 ### Gather Summary files and generate a report. 
+
+>Start an interactive session in your current directory i.e. `QCD`.
+
+```
+
+srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=1 --time=12:00:00 --pty /bin/bash
+
+```
 
 > Preview the steps in QCD report by performing a dryrun of the pipeline. 
 
@@ -143,7 +164,7 @@ snakemake -s QCD_report.smk --dryrun -p
 
 ```
 
-snakemake -s QCD_report.smk -p --use-singularity --cores all
+snakemake -s QCD_report.smk -p --use-singularity --cores 2
 
 ```
 ![Alt text](./QCD_report_dag.svg)
