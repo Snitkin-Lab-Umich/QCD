@@ -1,5 +1,5 @@
 # Author: Ali Pirani
-configfile: "config/config.yaml"
+#configfile: "config/config.yaml"
 
 import pandas as pd
 import os
@@ -80,26 +80,26 @@ def coverage_report(prefix, outdir):
 
     #Coverage_dist.savefig('%s/%s_Coverage_distribution.pdf' % (report_dir, prefix))
 
-def kraken_report(prefix, outdir):
-    prefix = prefix.pop()
-    outdir = outdir.pop()
+#def kraken_report(prefix, outdir):
+#    prefix = prefix.pop()
+#    outdir = outdir.pop()
     
     # Organize reports directory
-    report_dir = str(outdir) + "/%s_Report" % prefix
-    report_script_dir = str(outdir) + "/%s_Report/scripts" % prefix
+#    report_dir = str(outdir) + "/%s_Report" % prefix
+#    report_script_dir = str(outdir) + "/%s_Report/scripts" % prefix
 
-    kraken_dir = str(outdir) + "/*/kraken"
+#    kraken_dir = str(outdir) + "/*/kraken"
 
-    kraken_summary_script = open("%s/kraken_summary.sh" % report_script_dir, 'w+')
-    kraken_summary_script.write("echo \"Sample,Percentage of reads for Species,# of reads for Species, Species\" > %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
-    kraken_summary_script.write("for i in results/%s/*/kraken/*_kraken_report.tsv; do grep -w 'S' $i | sort -k1n | tail -n1; done > /tmp/Kraken_report_temp.txt\n" % prefix)
-    kraken_summary_script.write("ls -d results/%s/*/kraken/*_kraken_report.tsv | awk -F'/' '{print $NF}' | sed 's/_kraken_report.tsv//g' > %s/data/samplenames.txt\n" % (prefix, report_dir))
-    kraken_summary_script.write("paste %s/data/samplenames.txt /tmp/Kraken_report_temp.txt > /tmp/Kraken_report_combined.txt\n" % (report_dir))
-    kraken_summary_script.write("awk -F'\\t' 'BEGIN{OFS=\",\"};{print $1, $2, $3, $7}' /tmp/Kraken_report_combined.txt >> %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
-    kraken_summary_script.write("sed -i 's/\s//g' %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
-    kraken_summary_script.close()
+#    kraken_summary_script = open("%s/kraken_summary.sh" % report_script_dir, 'w+')
+#    kraken_summary_script.write("echo \"Sample,Percentage of reads for Species,# of reads for Species, Species\" > %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
+#    kraken_summary_script.write("for i in results/%s/*/kraken/*_kraken_report.tsv; do grep -w 'S' $i | sort -k1n | tail -n1; done > /tmp/Kraken_report_temp.txt\n" % prefix)
+#    kraken_summary_script.write("ls -d results/%s/*/kraken/*_kraken_report.tsv | awk -F'/' '{print $NF}' | sed 's/_kraken_report.tsv//g' > %s/data/samplenames.txt\n" % (prefix, report_dir))
+#    kraken_summary_script.write("paste %s/data/samplenames.txt /tmp/Kraken_report_temp.txt > /tmp/Kraken_report_combined.txt\n" % (report_dir))
+#    kraken_summary_script.write("awk -F'\\t' 'BEGIN{OFS=\",\"};{print $1, $2, $3, $7}' /tmp/Kraken_report_combined.txt >> %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
+#    kraken_summary_script.write("sed -i 's/\s//g' %s/data/%s_Kraken_report_final.csv\n" % (report_dir, prefix))
+#    kraken_summary_script.close()
 
-    os.system("bash %s/kraken_summary.sh" % report_script_dir)
+#    os.system("bash %s/kraken_summary.sh" % report_script_dir)
 
 def skani_report(outdir, prefix):
     prefix = prefix.pop()
@@ -144,7 +144,7 @@ def summary(prefix, outdir):
     Coverage = pd.read_csv("results/%s/%s_Report/data/%s_Final_Coverage.txt" % (prefix, prefix, prefix), sep=',', header=0)
     Coverage.rename(columns = {'Sample_name':'Sample'}, inplace = True)
 
-    kraken = pd.read_csv("results/%s/%s_Report/data/%s_Kraken_report_final.csv" % (prefix, prefix, prefix), sep=',', header=0)
+    #kraken = pd.read_csv("results/%s/%s_Report/data/%s_Kraken_report_final.csv" % (prefix, prefix, prefix), sep=',', header=0)
     
     mlst = pd.read_csv("results/%s/%s_Report/data/%s_MLST_results.csv" % (prefix, prefix, prefix), sep='\t', header=0)
     mlst = mlst.replace(['_contigs_l1000.fasta'], '', regex=True)
@@ -185,13 +185,14 @@ def summary(prefix, outdir):
     skani_summary = pd.read_csv("results/%s/%s_Report/data/%s_Skani_report_final.csv" % (prefix, prefix, prefix), sep=',', skipinitialspace=True, header=0, engine='python')
 
     QC_summary_temp1 = pd.merge(Coverage, mlst, on=["Sample", "Sample"],  how='left')
-    QC_summary_temp2 = pd.merge(QC_summary_temp1, kraken, on=["Sample", "Sample"],  how='left')
+    QC_summary_temp2 = QC_summary_temp1
     QC_summary_temp3 = pd.merge(QC_summary_temp2, raw_multiqc_fastqc_summary, on=["Sample", "Sample"], how='left')
     QC_summary_temp4 = pd.merge(QC_summary_temp3, aftertrim_multiqc_fastqc_summary, on=["Sample", "Sample"], how='left')
     QC_summary_temp5 = pd.merge(QC_summary_temp4, multiqc_quast, on=["Sample", "Sample"], how='left')
     QC_summary_temp6 = pd.merge(QC_summary_temp5, contig_distribution, on=["Sample", "Sample"], how='left')
     
-    QC_summary_temp7 = QC_summary_temp6[["Sample" , "Total_reads" , "Total_bp" , "MeanReadLength" , "Coverage" , "Scheme" , "ST" , "PercentageofreadsforSpecies" , "#ofreadsforSpecies" , "Species" , "After_trim_per_base_sequence_content" , "After_trim_overrepresented_sequences" , "After_trim_%GC" , "After_trim_Total Bases" , "After_trim_Total Sequences" , "After_trim_median_sequence_length" , "After_trim_avg_sequence_length" , "After_trim_total_deduplicated_percentage" , "After_trim_Sequence length" , "After_trim_adapter_content" , "N50" , "Total length" , "Total # of contigs"]].copy() #.copy() to deal with SettingWithCopyWarning error
+    #QC_summary_temp7 = QC_summary_temp6[["Sample" , "Total_reads" , "Total_bp" , "MeanReadLength" , "Coverage" , "Scheme" , "ST" , "PercentageofreadsforSpecies" , "#ofreadsforSpecies" , "Species" , "After_trim_per_base_sequence_content" , "After_trim_overrepresented_sequences" , "After_trim_%GC" , "After_trim_Total Bases" , "After_trim_Total Sequences" , "After_trim_median_sequence_length" , "After_trim_avg_sequence_length" , "After_trim_total_deduplicated_percentage" , "After_trim_Sequence length" , "After_trim_adapter_content" , "N50" , "Total length" , "Total # of contigs"]].copy() #.copy() to deal with SettingWithCopyWarning error
+    QC_summary_temp7 = QC_summary_temp6[["Sample" , "Total_reads" , "Total_bp" , "MeanReadLength" , "Coverage" , "Scheme" , "ST" , "After_trim_per_base_sequence_content" , "After_trim_overrepresented_sequences" , "After_trim_%GC" , "After_trim_Total Bases" , "After_trim_Total Sequences" , "After_trim_median_sequence_length" , "After_trim_avg_sequence_length" , "After_trim_total_deduplicated_percentage" , "After_trim_Sequence length" , "After_trim_adapter_content" , "N50" , "Total length" , "Total # of contigs"]].copy() #.copy() to deal with SettingWithCopyWarning error
 
     QC_check_condition = [
     (QC_summary_temp7['Total # of contigs'] > config["max_contigs"]),
@@ -233,55 +234,55 @@ def plot(prefix, outdir):
     fig.savefig('%s/fig/%s_aftertrim_dedup_vs_totalsequence.png' % (report_dir, prefix), dpi=600)
     ax1.cla()
 
-    ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['After_trim_%GC'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
+    #ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['After_trim_%GC'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
     #g.legend(loc='right', bbox_to_anchor=(1.30, 0.5), ncol=1)
     #fig2 = g.get_figure()
     #fig2.savefig('%s/fig/%s_Assembly_contig_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=600)
-    plt.savefig('%s/fig/%s_Assembly_contig_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=200)
-    ax.cla()
+    #plt.savefig('%s/fig/%s_Assembly_contig_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=200)
+    #ax.cla()
 
-    ax = sns.scatterplot(x=QC_summary['Total length'], y=QC_summary['After_trim_%GC'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
+    #ax = sns.scatterplot(x=QC_summary['Total length'], y=QC_summary['After_trim_%GC'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
     #g.legend(loc='right', bbox_to_anchor=(1.30, 0.5), ncol=1)
     #fig2 = g.get_figure()
     #fig2.savefig('%s/fig/%s_Assembly_contig_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=600)
-    plt.savefig('%s/fig/%s_Assembly_length_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=200)
-    ax.cla()
+    #plt.savefig('%s/fig/%s_Assembly_length_vs_Aftertrim_GC.png' % (report_dir, prefix), dpi=200)
+    #ax.cla()
 
-    ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['N50'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
+    #ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['N50'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
     #g.legend(loc='right', bbox_to_anchor=(1.30, 0.5), ncol=1)
     #fig2 = g.get_figure()
     #fig2.savefig('%s/fig/%s_Assembly_contig_vs_N50.png' % (report_dir, prefix), dpi=600)
-    plt.savefig('%s/fig/%s_Assembly_contig_vs_N50.png' % (report_dir, prefix), dpi=200)
-    ax.cla()
+    #plt.savefig('%s/fig/%s_Assembly_contig_vs_N50.png' % (report_dir, prefix), dpi=200)
+    #ax.cla()
 
-    ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['Coverage'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
+    #ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['Coverage'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
     #g.legend(loc='right', bbox_to_anchor=(1.30, 0.5), ncol=1)
     #fig2 = g.get_figure()
     #fig2.savefig('%s/fig/%s_Assembly_contig_vs_N50.png' % (report_dir, prefix), dpi=600)
-    plt.savefig('%s/fig/%s_Assembly_contig_vs_Coverage.png' % (report_dir, prefix), dpi=200)
-    ax.cla()
+    #plt.savefig('%s/fig/%s_Assembly_contig_vs_Coverage.png' % (report_dir, prefix), dpi=200)
+    #ax.cla()
 
-    ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['Total length'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
+    #ax = sns.scatterplot(x=QC_summary['Total # of contigs'], y=QC_summary['Total length'], hue=QC_summary['Species'], s=100, style=QC_summary['Species'])
     #g.legend(loc='right', bbox_to_anchor=(1.30, 0.5), ncol=1)
     #fig2 = g.get_figure()
     #fig2.savefig('%s/fig/%s_Assembly_contig_vs_N50.png' % (report_dir, prefix), dpi=600)
-    plt.savefig('%s/fig/%s_Assembly_contig_vs_length.png' % (report_dir, prefix), dpi=200)
-    ax.cla()
+    #plt.savefig('%s/fig/%s_Assembly_contig_vs_length.png' % (report_dir, prefix), dpi=200)
+    #ax.cla()
 
-
-rule all:
-    input:
-        coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
-        kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
-        skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
-        multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
-        mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
-        QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
-        QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX)
+#rule all:
+#    input:
+#        coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
+#        kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
+#        skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
+#        multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
+#        mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
+#        QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
+#        QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX)
 
 rule coverage_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
+        coverage_out = expand("results/{prefix}/{sample}/raw_coverage/{sample}_coverage.json", prefix=PREFIX, sample=SAMPLE)
     output:
         coverage = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Final_Coverage.txt",
     params:
@@ -297,26 +298,27 @@ rule amr_report:
     params:
         prefix = "{prefix}",
         phandango = "--no_tree"
-    #conda:
-    #    "envs/ariba.yaml"
-    singularity:
-        "docker://staphb/ariba:2.14.7"
+    conda:
+        "envs/ariba.yaml"
+    #singularity:
+    #    "docker://staphb/ariba:2.14.7"
     shell:
         "ariba summary --preset minimal {params.phandango} {input.outdir}/report/{params.prefix}_AMR_minimal_report {input.outdir}/*/ariba_card/report.tsv && ariba summary --preset all {params.phandango} {input.outdir}/report/{params.prefix}_AMR_all_report {input.outdir}/*/ariba_card/report.tsv"
 
-rule kraken_report:
-    input:
-        outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
-    output:
-        kraken_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Kraken_report_final.csv",
-    params:
-        prefix = "{prefix}",
-    run:
-        kraken_report({params.prefix}, {input.outdir})
+#rule kraken_report:
+#    input:
+#        outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
+#    output:
+#        kraken_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Kraken_report_final.csv",
+#    params:
+#        prefix = "{prefix}",
+#    run:
+#        kraken_report({params.prefix}, {input.outdir})
 
 rule skani_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
+        skani_out = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", prefix=PREFIX, sample=SAMPLE)
     output:
         skani_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Skani_report_final.csv",
     params:
@@ -328,10 +330,11 @@ rule multiqc:
     input:
         inputdir = lambda wildcards: expand(f"results/{wildcards.prefix}"),
         coverage = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Final_Coverage.txt"),
-        kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
+        #kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
         mlst = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_MLST_results.csv"),
     output:
         multiqc_fastqc_report = f"results/{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report.html",
+        #fastqc_report = f"results//{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report_data/multiqc_fastqc.txt"
     params:
         outdir = "results/{prefix}/{prefix}_Report",
         prefix = "{prefix}",
@@ -340,11 +343,12 @@ rule multiqc:
     singularity:
         "docker://staphb/multiqc:1.19"
     shell:
-        "multiqc -f --export --outdir {params.outdir}/multiqc -n {params.prefix}_QC_report -i {params.prefix}_QC_report {input.inputdir}/*/quality_aftertrim/*_Forward {input.inputdir}/*/kraken {input.inputdir}/*/prokka {input.inputdir}/*/quast"
+        "multiqc -f --export --outdir {params.outdir}/multiqc -n {params.prefix}_QC_report -i {params.prefix}_QC_report {input.inputdir}/*/quality_aftertrim/*_Forward {input.inputdir}/*/prokka {input.inputdir}/*/quast"
 
-rule mlst:
+rule mlst_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
+        mlst_out = expand("results/{prefix}/{sample}/mlst/report.tsv", prefix=PREFIX, sample=SAMPLE)
     output:
         mlst_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_MLST_results.csv",
     params:
@@ -357,7 +361,7 @@ rule Summary:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
         multiqc_fastqc_report = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/multiqc/{wildcards.prefix}_QC_report.html"),
         coverage = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Final_Coverage.txt"),
-        kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
+        #kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
         mlst = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_MLST_results.csv"),
         skani_report = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Skani_report_final.csv")
     output:
