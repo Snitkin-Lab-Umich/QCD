@@ -7,11 +7,11 @@ samples: config/sample.tsv
 short_reads: /nfs/turbo/umms-esnitkin/Github/test_data/fastq
 
 # Directory prefix where the outputs will be saved to
-# Rename this to your preferred naming convention
-prefix: 2024-05-21_QCD_Project_Test
+# Rename this to your preferred naming convention with this format:year-month-day_Project_Name_QCD
+prefix: 2024-08-12_Project_Test_With_Singularity_QCD
 
 # Change to genome size of your organism of interest 
-genome_size: 3000000
+genome_size: 6000000
 
 # Cores used for busco and trimmomatic
 # Optional to change this
@@ -45,12 +45,12 @@ prokka: -kingdom Bacteria --force --rfam
 # Change this to your organism of interest 
 # Check the website below for proper naming convention
 # https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus#--organism-option
-amrfinder_organism: Klebsiella_pneumoniae
+#amrfinder_organism: Klebsiella_pneumoniae
 
 # QC thresholds 
 min_contigs: 10
 max_contigs: 500
-assembly_length: 7000000
+assembly_length: 8000000
 coverage: 20
 
 # Skani database
