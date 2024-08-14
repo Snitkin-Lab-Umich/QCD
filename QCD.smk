@@ -1,6 +1,8 @@
 # Author: Ali Pirani
 configfile: "config/config.yaml"
 
+include: "QCD_report.smk"
+
 import pandas as pd
 import os
 
@@ -113,10 +115,17 @@ rule all:
         spades_l1000_assembly = expand("results/{prefix}/{sample}/spades/{sample}_contigs_l1000.fasta", sample=SAMPLE, prefix=PREFIX),
         prokka_gff = expand("results/{prefix}/{sample}/prokka/{sample}.gff", sample=SAMPLE, prefix=PREFIX),
         quast_report = expand("results/{prefix}/{sample}/quast/report.tsv", sample=SAMPLE, prefix=PREFIX),
-        amrfinder = expand("results/{prefix}/{sample}/amrfinder/{sample}_amrfinder.tsv", sample=SAMPLE, prefix=PREFIX),
+        #amrfinder = expand("results/{prefix}/{sample}/amrfinder/{sample}_amrfinder.tsv", sample=SAMPLE, prefix=PREFIX),
         mlst_report = expand("results/{prefix}/{sample}/mlst/report.tsv", sample=SAMPLE, prefix=PREFIX),
-        kraken_report = expand("results/{prefix}/{sample}/kraken/{sample}_kraken_report.tsv", sample=SAMPLE, prefix=PREFIX),
-        skani_ref_genome_results = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", sample=SAMPLE, prefix=PREFIX)
+        #kraken_report = expand("results/{prefix}/{sample}/kraken/{sample}_kraken_report.tsv", sample=SAMPLE, prefix=PREFIX),
+        skani_ref_genome_results = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", sample=SAMPLE, prefix=PREFIX),
+        coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
+        #kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
+        skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
+        multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
+        mlst_final_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
+        QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
+        QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX)
 
 rule coverage:
     input:
@@ -148,14 +157,16 @@ rule quality_raw:
     #    "envs/fastqc.yaml"
     singularity:
         "docker://staphb/fastqc:0.12.1"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "fastqc"
     shell:
         "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
 
 rule trimmomatic_pe:
     input:
         r1 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R1.fastq.gz")),
-        r2 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R2.fastq.gz")),
-        
+        r2 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R2.fastq.gz"))  
     output:
         r1 = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R1_trim_paired.fastq.gz",
         r2 = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R2_trim_paired.fastq.gz", 
@@ -177,9 +188,12 @@ rule trimmomatic_pe:
     log:
         "logs/{prefix}/{sample}/trimmomatic/{sample}.log"
     #conda:
-        #"envs/trimmomatic.yaml"
+    #    "envs/trimmomatic.yaml"
     singularity:
         "docker://staphb/trimmomatic:0.39"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "trimmomatic"
     shell:
         "trimmomatic PE {input.r1} {input.r2} {output.r1} {output.r1_unpaired} {output.r2} {output.r2_unpaired} -threads {params.threads} ILLUMINACLIP:{params.adapter_filepath}:{params.seed}:{params.palindrome_clip}:{params.simple_clip}:{params.minadapterlength}:{params.keep_both_reads} SLIDINGWINDOW:{params.window_size}:{params.window_size_quality} MINLEN:{params.minlength} HEADCROP:{params.headcrop_length} &>{log}"
 
@@ -198,6 +212,9 @@ rule quality_aftertrim:
     #    "envs/fastqc.yaml"
     singularity:
         "docker://staphb/fastqc:0.12.1"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "fastqc"
     shell:
         "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
 
@@ -205,7 +222,6 @@ rule downsample:
     input:
         r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
         r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
-
     output:
         outr1 = f"results/{{prefix}}/{{sample}}/downsample/{{sample}}_R1_trim_paired.fastq.gz",
         outr2 = f"results/{{prefix}}/{{sample}}/downsample/{{sample}}_R2_trim_paired.fastq.gz",
@@ -244,23 +260,44 @@ rule assembly:
     #conda:
     #    "envs/spades.yaml"
     singularity:
-        "docker://staphb/spades:3.15.5"
+        "docker://staphb/spades:4.0.0"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "spades/4.0.0"
     shell:
         "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir}"
 
+#rule bioawk:
+#    input:
+#        spades_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta"),
+#    output:
+#        spades_l1000_assembly = f"results/{{prefix}}/{{sample}}/spades/{{sample}}_contigs_l1000.fasta",
+#    params:
+#        out_dir = "results/{prefix}/{sample}/spades/",
+#        bioawk_params = config["bioawk"],
+#        prefix = "{sample}",
+#    conda:
+#        "envs/bioawk.yaml"
+#    shell:
+#        """
+#        {params.bioawk_params} {input.spades_assembly} > {output.spades_l1000_assembly} && grep '>' {output.spades_l1000_assembly} > {params.out_dir}/spades_assembly_header_info.txt && sed -i 's/>NODE_/>{params.prefix}_/g' {output.spades_l1000_assembly} && sed -i 's/_length_.*_cov_.*//g' {output.spades_l1000_assembly}
+#        """
+
 rule bioawk:
     input:
-        spades_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta"),
+        spades_assembly = lambda wildcards: f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta"
     output:
-        spades_l1000_assembly = f"results/{{prefix}}/{{sample}}/spades/{{sample}}_contigs_l1000.fasta",
+        spades_l1000_assembly = "results/{prefix}/{sample}/spades/{sample}_contigs_l1000.fasta"
     params:
         out_dir = "results/{prefix}/{sample}/spades/",
         bioawk_params = config["bioawk"],
-        prefix = "{sample}",
+        prefix = "{sample}"
     conda:
         "envs/bioawk.yaml"
     shell:
-        "{params.bioawk_params} {input.spades_assembly} > {output.spades_l1000_assembly} && grep '>' {output.spades_l1000_assembly} > {params.out_dir}/spades_assembly_header_info.txt && sed -i 's/>NODE_/>{params.prefix}_/g' {output.spades_l1000_assembly} && sed -i 's/_length_.*_cov_.*//g' {output.spades_l1000_assembly}"
+        """
+        ./bioawk.sh {input.spades_assembly} {output.spades_l1000_assembly} {params.out_dir} {params.prefix}
+        """
 
 rule prokka:
     input:
@@ -275,6 +312,9 @@ rule prokka:
     #    "envs/prokka.yaml"
     singularity:
         "docker://staphb/prokka:1.14.6"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "prokka"
     shell:
         "prokka -outdir {params.outdir} --strain {params.prefix} --prefix {params.prefix} {params.prokka_params} {input.spades_l1000_assembly}"
 
@@ -290,6 +330,9 @@ rule quast:
     #    "envs/quast.yaml"
     singularity:
         "docker://staphb/quast:5.0.2"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "quast"
     shell:
         "quast.py {input.spades_l1000_assembly} -o {params.outdir} --contig-thresholds 0,1000,5000,10000,25000,50000"
 
@@ -304,25 +347,28 @@ rule mlst:
     #conda:
     #    "envs/mlst.yaml"
     singularity:
-        "docker://staphb/mlst:latest"
+        "docker://staphb/mlst:2.23.0-2024-03"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "mlst"
     shell:
         "mlst {input.spades_l1000_assembly} > {output.mlst_report}"
 
-rule amrfinder:
-    input:
-        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
-    output:
-        amrfinder = f"results/{{prefix}}/{{sample}}/amrfinder/{{sample}}_amrfinder.tsv",
-    params: 
-        outdir = "results/{prefix}/{sample}/amrfinder",
-        prefix = "{sample}",
-        organism = config['amrfinder_organism']
+#rule amrfinder:
+#    input:
+#        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
+#    output:
+#        amrfinder = f"results/{{prefix}}/{{sample}}/amrfinder/{{sample}}_amrfinder.tsv",
+#    params: 
+#        outdir = "results/{prefix}/{sample}/amrfinder",
+#        prefix = "{sample}",
+#        organism = config['amrfinder_organism']
     #conda:
     #    "envs/amrfinder.yaml"
-    singularity:
-        "docker://staphb/ncbi-amrfinderplus:latest"
-    shell:
-        "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly} -O {params.organism}"
+#    singularity:
+#        "docker://staphb/ncbi-amrfinderplus:latest"
+#    shell:
+#        "amrfinder --plus --output {output.amrfinder} --debug --log {params.outdir}/{params.prefix}.log --nucleotide_output {params.outdir}/{params.prefix}_reported_nucl.fna -n {input.spades_l1000_assembly} -O {params.organism}"
 
 rule busco:
     input:
@@ -336,7 +382,10 @@ rule busco:
     #conda:
     #    "envs/busco.yaml"
     singularity:
-        "docker://staphb/busci:latest"
+        "docker://staphb/busco:5.7.1-prok-bacteria_odb10_2024-01-08"
+    #envmodules:
+    #    "Bioinformatics",
+    #    "busco"
     shell:
         "busco -f -i {input.spades_l1000_assembly} -m genome -l bacteria_odb10 -o {params.outdir}"
 
@@ -355,28 +404,31 @@ rule skani:
     shell:
         "skani search {input.spades_contigs_file} -d {params.skani_ani_db} -o {output.skani_output} -t {params.threads}"
         
-rule multiqc:
-    input:
-        quast_report = f"results/{{prefix}}/{{sample}}/quast/report.tsv",
-        prokka_gff = f"results/{{prefix}}/{{sample}}/prokka/{{sample}}.gff",
-        spades_assembly = f"results/{{prefix}}/{{sample}}/spades/contigs.fasta",
-        kraken_report = f"results/{{prefix}}/{{sample}}/kraken/{{sample}}_kraken_report.tsv",
-        coverage = f"results/{{prefix}}/{{sample}}/raw_coverage/{{sample}}_coverage.json",
-        aftertrim_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Forward/{{sample}}_R1_trim_paired_fastqc.html",
-        aftertrim_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Reverse/{{sample}}_R2_trim_paired_fastqc.html",
-        raw_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Forward/{{sample}}_R1_fastqc.html",
-        raw_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Reverse/{{sample}}_R2_fastqc.html",
-        
-    output:
-        multiqc_report = f"results/{{prefix}}/multiqc/{{prefix}}_QC_report.html",
-    params:
-        resultsoutdir = "results/{prefix}",
-        outdir = "results/{prefix}/multiqc",
-        prefix = "{prefix}",
+#rule multiqc:
+#    input:
+#        quast_report = f"results/{{prefix}}/{{sample}}/quast/report.tsv",
+#        prokka_gff = f"results/{{prefix}}/{{sample}}/prokka/{{sample}}.gff",
+#        spades_assembly = f"results/{{prefix}}/{{sample}}/spades/contigs.fasta",
+#        kraken_report = f"results/{{prefix}}/{{sample}}/kraken/{{sample}}_kraken_report.tsv",
+#        coverage = f"results/{{prefix}}/{{sample}}/raw_coverage/{{sample}}_coverage.json",
+#        aftertrim_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Forward/{{sample}}_R1_trim_paired_fastqc.html",
+#        aftertrim_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Reverse/{{sample}}_R2_trim_paired_fastqc.html",
+#        raw_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Forward/{{sample}}_R1_fastqc.html",
+#        raw_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Reverse/{{sample}}_R2_fastqc.html"
+#    output:
+#        multiqc_report = f"results/{{prefix}}/multiqc/{{prefix}}_QC_report.html",
+#    params:
+#        resultsoutdir = "results/{prefix}",
+#        outdir = "results/{prefix}/multiqc",
+#        prefix = "{prefix}",
     #conda:
     #    "envs/multiqc.yaml"
-    singularity:
-        "docker://staphb/multiqc:1.19"
-    shell:
-        "multiqc -f --outdir {params.outdir} -n {params.prefix}_QC_report -i {params.prefix}_QC_report {params.resultsoutdir}"
+    #singularity:
+        #"docker://staphb/multiqc:1.18"
+#    shell:
+#        """
+#        module load Bioinformatics
+#        module load multiqc
+#        multiqc -f --outdir {params.outdir} -n {params.prefix}_QC_report -i {params.prefix}_QC_report {params.resultsoutdir}
+#        """
         
