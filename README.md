@@ -67,16 +67,16 @@ cd QCD
 
 ```
 
-module load Bioinformatics
+module load Bioinformatics snakemake singularity
 
 ```
-
+<!--
 ```
 
 module load snakemake singularity
 
 ```
-
+-->
 
 This workflow makes use of singularity containers available through [State Public Health Bioinformatics group](https://github.com/StaPH-B/docker-builds). If you are working on Great Lakes (umich cluster)—you can load snakemake and singularity modules as shown above. However, if you are running it on your local or other computing platform, ensure you have snakemake and singularity installed.
 
@@ -111,7 +111,7 @@ done >> config/sample.tsv
 
 ### Cluster file
 
-Reduce the walltime (to ~6 hours) in `config/cluster_kraken.json` to ensure the jobs are being submitted in a timely manner. 
+Reduce the walltime (to ~6 hours) in `config/cluster.json` to ensure the jobs are being submitted in a timely manner. 
 
 ## Quick start
 
@@ -137,12 +137,13 @@ snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
 
 ```
 
-snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config config/cluster_kraken.json --configfile config/config.yaml --latency-wait 1000 --nolock
+snakemake -s QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
+> Submit QCD as a batch job (_coming soon!_)
 
 ![Alt text](./QCD_dag.svg)
-
+<!--
 ### Gather Summary files and generate a report. 
 
 >Start an interactive session in your current directory i.e. `QCD`.
@@ -168,7 +169,7 @@ snakemake -s QCD_report.smk -p --use-singularity --cores 2
 
 ```
 ![Alt text](./QCD_report_dag.svg)
-
+-->
 ## Dependencies
 
 ### Near Essential
