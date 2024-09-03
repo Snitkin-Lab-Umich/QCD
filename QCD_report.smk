@@ -176,10 +176,24 @@ def summary(prefix, outdir):
         multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
     #multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
 
+    def reformat_sample_name(name):
+        if '_S' in name:
+            # Replace underscores with dashes, but keep the format before the final _S
+            parts = name.rsplit('_S', 1)
+            if len(parts) == 2:
+                prefix = parts[0].replace('_', '-')
+                suffix = '_S' + parts[1]
+                return prefix + suffix
+        else:
+            return name    
+    # Reformat the multiqc_quast df sample names
+    multiqc_quast['Sample'] = multiqc_quast['Sample'].apply(reformat_sample_name)
+
     contig_distribution = pd.read_csv("results/%s/%s_Report/multiqc/%s_QC_report_data/mqc_quast_num_contigs_1.txt" % (prefix, prefix, prefix), sep='\t', header=0)
     contig_distribution = contig_distribution.replace(['_contigs_l1000'], '', regex=True)
     contig_distribution['Total # of contigs'] = contig_distribution.sum(axis=1, numeric_only=True)
     contig_distribution = contig_distribution[['Sample', 'Total # of contigs']]
+    contig_distribution['Sample'] = contig_distribution['Sample'].apply(reformat_sample_name)
 
     #read final skani output file
     skani_summary = pd.read_csv("results/%s/%s_Report/data/%s_Skani_report_final.csv" % (prefix, prefix, prefix), sep=',', skipinitialspace=True, header=0, engine='python')
@@ -206,7 +220,7 @@ def summary(prefix, outdir):
 
     QC_summary_temp7['QC Check'] = np.select(QC_check_condition, status)
 
-    QC_summary_temp8 = pd.merge(QC_summary_temp7, skani_summary, on=["Sample", "Sample"], how='left') # Merge skani df into the existing DataFrame
+    QC_summary_temp8 = pd.merge(QC_summary_temp7, skani_summary, on=["Sample", "Sample"], how='left') # Merge skani df into the existing dataframe
 
     QC_summary_temp8.to_csv('results/%s/%s_Report/data/%s_QC_summary.csv' % (prefix, prefix, prefix), index=False)
 
@@ -272,7 +286,7 @@ def plot(prefix, outdir):
 #rule all:
 #    input:
 #        coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
-#        kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
+        #kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
 #        skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
 #        multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
 #        mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
