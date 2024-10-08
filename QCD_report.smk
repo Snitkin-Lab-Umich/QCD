@@ -1,4 +1,4 @@
-# Author: Ali Pirani
+# Author: Dhatri Badri and Ali Pirani
 #configfile: "config/config.yaml"
 
 import pandas as pd
@@ -58,7 +58,7 @@ def coverage_report(prefix, outdir):
     f3.write(header)
 
     for sampl in SAMPLE:
-        coverage_json = "results/%s/%s/raw_coverage/%s_coverage.json" % (prefix, sampl, sampl)
+        coverage_json = "results/%s/raw_coverage/%s/%s_coverage.json" % (prefix, sampl, sampl)
         f = open(coverage_json)
         data = json.load(f)
         # data = json.loads(coverage_json)
@@ -106,31 +106,42 @@ def skani_report(outdir, prefix):
     outdir = "results/%s" % prefix
     report_dir = str(outdir) + "/%s_Report" % prefix
     report_data_dir = report_dir + "/data"
+    result_df = pd.DataFrame(columns=['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name', 'Species'])  # Add 'Species' column
 
-    result_df = pd.DataFrame(columns=['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']) # Create an empty DataFrame to store the results
+    skani_dir = os.path.join(outdir, 'skani')  # Navigate to skani directory
 
-    for root, samples, skani_files in os.walk(outdir): # Iterate over samples in the results/prefix directory
-        for sample_name in samples:
-            skani_file_path = os.path.join(root, sample_name, 'skani', f'{sample_name}_skani_output.txt')
+    for sample_name in os.listdir(skani_dir):  # Iterate over samples in the results/prefix/skani directory
+        sample_dir = os.path.join(skani_dir, sample_name)
 
-            if os.path.exists(skani_file_path): # Check if the skani file exists
-                skani_file = pd.read_csv(skani_file_path, sep='\t| ,', skipinitialspace=True, header=0, engine='python') # Read the skani file
-                first_row_df = skani_file[['ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']].iloc[:1] # Extract the first row from specific columns
+        if os.path.isdir(sample_dir):  # Check if it's a directory
+            skani_file_path = os.path.join(sample_dir, f'{sample_name}_skani_output.txt')  # Look for the skani output file
 
-                if first_row_df.empty: # Check if the first row is empty
-                    first_row_df = pd.DataFrame({'Sample': [sample_name], # Create a DataFrame with NaN values and add the sample name
-                                                'ANI': ["NAs"],
-                                                'Align_fraction_ref': ["NAs"],
-                                                'Align_fraction_query': ["NAs"],
-                                                'Ref_name': ["NAs"]})
+            if os.path.exists(skani_file_path):  # Check if the skani file exists
+                skani_file = pd.read_csv(skani_file_path, sep='\t| ,', skipinitialspace=True, header=0, engine='python')  # Read the skani file
+                first_row_df = skani_file[['ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']].iloc[:1]  # Extract the first row
+
+                if first_row_df.empty:  # Check if the first row is empty
+                    first_row_df = pd.DataFrame({
+                        'Sample': [sample_name],  # Add sample name
+                        'ANI': ["NA"],
+                        'Align_fraction_ref': ["NA"],
+                        'Align_fraction_query': ["NA"],
+                        'Ref_name': ["NA"],
+                        'Species': ["NA"]  # Add NAs for Species
+                    })
                 else:
-                    first_row_df.loc[:, 'Sample'] = sample_name  # Add a new column for the sample name
+                    first_row_df.loc[:, 'Sample'] = sample_name  # Add sample name
+                    # Extract species using regex from Ref_name
+                    first_row_df.loc[:, 'Species'] = first_row_df['Ref_name'].apply(
+                        lambda x: re.search(r"[A-Za-z]+\s[A-Za-z]+", x).group(0) if pd.notnull(x) and re.search(r"[A-Za-z]+\s[A-Za-z]+", x) else "NAs"
+                    )
 
-                first_row_df = first_row_df[['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name']] # Reorder the columns
-                result_df = pd.concat([result_df, first_row_df], ignore_index=True) # Concatenate the result to the overall DataFrame
-    
-    result_file_path = os.path.join(report_data_dir, '%s_Skani_report_final.csv' % prefix) # Save the final result to CSV files in the output directory
+                first_row_df = first_row_df[['Sample', 'ANI', 'Align_fraction_ref', 'Align_fraction_query', 'Ref_name', 'Species']]  # Reorder columns
+                result_df = pd.concat([result_df, first_row_df], ignore_index=True)  # Concatenate to the result dataframe
+
+    result_file_path = os.path.join(report_data_dir, f'{prefix}_Skani_report_final.csv')  # Save final result to CSV
     result_df.to_csv(result_file_path, index=False)
+
 
 def summary(prefix, outdir):
     prefix = prefix.pop()
@@ -147,9 +158,10 @@ def summary(prefix, outdir):
     #kraken = pd.read_csv("results/%s/%s_Report/data/%s_Kraken_report_final.csv" % (prefix, prefix, prefix), sep=',', header=0)
     
     mlst = pd.read_csv("results/%s/%s_Report/data/%s_MLST_results.csv" % (prefix, prefix, prefix), sep='\t', header=0)
-    mlst = mlst.replace(['_contigs_l1000.fasta'], '', regex=True)
-    mlst = mlst.replace(['results/.*/spades/'], '', regex=True)
-    mlst = mlst.replace(['%s' % prefix], '', regex=True)
+    #mlst = mlst.replace(['_contigs_l1000.fasta'], '', regex=True)
+    #mlst = mlst.replace(['results/.*/spades/'], '', regex=True)
+    #mlst = mlst.replace(['%s' % prefix], '', regex=True)
+    mlst['Sample'] = mlst['Sample'].replace(r'.*/spades/(.*?)/.*', r'\1', regex=True)
 
     multiqc_fastqc_summary = pd.read_csv("results/%s/%s_Report/multiqc/%s_QC_report_data/multiqc_fastqc.txt" % (prefix, prefix, prefix), sep='\t', header=0)
     patternDel = "_R2"
@@ -176,24 +188,24 @@ def summary(prefix, outdir):
         multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
     #multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
 
-    def reformat_sample_name(name):
-        if '_S' in name:
-            # Replace underscores with dashes, but keep the format before the final _S
-            parts = name.rsplit('_S', 1)
-            if len(parts) == 2:
-                prefix = parts[0].replace('_', '-')
-                suffix = '_S' + parts[1]
-                return prefix + suffix
-        else:
-            return name    
+    #def reformat_sample_name(name):
+    #    if '_S' in name:
+    #        # Replace underscores with dashes, but keep the format before the final _S
+    #        parts = name.rsplit('_S', 1)
+    #        if len(parts) == 2:
+    #            prefix = parts[0].replace('_', '-')
+    #            suffix = '_S' + parts[1]
+    #            return prefix + suffix
+    #    else:
+    #        return name    
     # Reformat the multiqc_quast df sample names
-    multiqc_quast['Sample'] = multiqc_quast['Sample'].apply(reformat_sample_name)
+    #multiqc_quast['Sample'] = multiqc_quast['Sample'].apply(reformat_sample_name)
 
     contig_distribution = pd.read_csv("results/%s/%s_Report/multiqc/%s_QC_report_data/mqc_quast_num_contigs_1.txt" % (prefix, prefix, prefix), sep='\t', header=0)
     contig_distribution = contig_distribution.replace(['_contigs_l1000'], '', regex=True)
     contig_distribution['Total # of contigs'] = contig_distribution.sum(axis=1, numeric_only=True)
     contig_distribution = contig_distribution[['Sample', 'Total # of contigs']]
-    contig_distribution['Sample'] = contig_distribution['Sample'].apply(reformat_sample_name)
+    #contig_distribution['Sample'] = contig_distribution['Sample'].apply(reformat_sample_name)
 
     #read final skani output file
     skani_summary = pd.read_csv("results/%s/%s_Report/data/%s_Skani_report_final.csv" % (prefix, prefix, prefix), sep=',', skipinitialspace=True, header=0, engine='python')
@@ -218,7 +230,7 @@ def summary(prefix, outdir):
 
     status = ['FAIL', 'FAIL', 'FAIL', 'FAIL', "Run FAIL"]
 
-    QC_summary_temp7['QC Check'] = np.select(QC_check_condition, status)
+    QC_summary_temp7['QC Check'] = np.select(QC_check_condition, status, default='PASS')
 
     QC_summary_temp8 = pd.merge(QC_summary_temp7, skani_summary, on=["Sample", "Sample"], how='left') # Merge skani df into the existing dataframe
 
@@ -296,7 +308,7 @@ def plot(prefix, outdir):
 rule coverage_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
-        coverage_out = expand("results/{prefix}/{sample}/raw_coverage/{sample}_coverage.json", prefix=PREFIX, sample=SAMPLE)
+        coverage_out = expand("results/{prefix}/raw_coverage/{sample}/{sample}_coverage.json", prefix=PREFIX, sample=SAMPLE)
     output:
         coverage = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Final_Coverage.txt",
     params:
@@ -332,7 +344,7 @@ rule amr_report:
 rule skani_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
-        skani_out = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", prefix=PREFIX, sample=SAMPLE)
+        skani_out = expand("results/{prefix}/skani/{sample}/{sample}_skani_output.txt", prefix=PREFIX, sample=SAMPLE)
     output:
         skani_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_Skani_report_final.csv",
     params:
@@ -348,6 +360,8 @@ rule multiqc:
         mlst = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_MLST_results.csv"),
     output:
         multiqc_fastqc_report = f"results/{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report.html",
+        multiqc_fastqc = f"results/{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report_data/multiqc_fastqc.txt",
+        multiqc_general_stats = f"results/{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report_data/multiqc_general_stats.txt",
         #fastqc_report = f"results//{{prefix}}/{{prefix}}_Report/multiqc/{{prefix}}_QC_report_data/multiqc_fastqc.txt"
     params:
         outdir = "results/{prefix}/{prefix}_Report",
@@ -357,23 +371,25 @@ rule multiqc:
     singularity:
         "docker://staphb/multiqc:1.19"
     shell:
-        "multiqc -f --export --outdir {params.outdir}/multiqc -n {params.prefix}_QC_report -i {params.prefix}_QC_report {input.inputdir}/*/quality_aftertrim/*_Forward {input.inputdir}/*/prokka {input.inputdir}/*/quast"
+        "multiqc -f --export --outdir {params.outdir}/multiqc -n {params.prefix}_QC_report -i {params.prefix}_QC_report {input.inputdir}/quality_aftertrim/*/*_Forward {input.inputdir}/prokka/* {input.inputdir}/quast/*"
 
 rule mlst_report:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
-        mlst_out = expand("results/{prefix}/{sample}/mlst/report.tsv", prefix=PREFIX, sample=SAMPLE)
+        mlst_out = expand("results/{prefix}/mlst/{sample}/report.tsv", prefix=PREFIX, sample=SAMPLE)
     output:
         mlst_report = f"results/{{prefix}}/{{prefix}}_Report/data/{{prefix}}_MLST_results.csv",
     params:
         prefix = "{prefix}",
     shell:
-        "echo \"Sample\tScheme\tST\" > {output.mlst_report} && cut -f1-3 {input.outdir}/*/mlst/report.tsv >> {output.mlst_report}"
+        "echo \"Sample\tScheme\tST\" > {output.mlst_report} && cut -f1-3 {input.outdir}/mlst/*/report.tsv >> {output.mlst_report}"
 
 rule Summary:
     input:
         outdir = lambda wildcards: expand(f"results/{wildcards.prefix}/"),
         multiqc_fastqc_report = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/multiqc/{wildcards.prefix}_QC_report.html"),
+        multiqc_fastqc = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/multiqc/{wildcards.prefix}_QC_report_data/multiqc_fastqc.txt"),
+        multiqc_general_stats = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/multiqc/{wildcards.prefix}_QC_report_data/multiqc_general_stats.txt"),
         coverage = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Final_Coverage.txt"),
         #kraken = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_Kraken_report_final.csv"),
         mlst = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.prefix}_Report/data/{wildcards.prefix}_MLST_results.csv"),
