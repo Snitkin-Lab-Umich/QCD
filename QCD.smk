@@ -1,4 +1,4 @@
-# Author: Ali Pirani
+# Author: Ali Pirani and Dhatri Badri
 configfile: "config/config.yaml"
 
 include: "QCD_report.smk"
@@ -106,33 +106,30 @@ def downsample_reads(file, file2, out1, out2, genome_size):
 
 rule all:
     input:
-        coverage = expand("results/{prefix}/{sample}/raw_coverage/{sample}_coverage.json", sample=SAMPLE, prefix=PREFIX),
-        fastqc_raw = expand("results/{prefix}/{sample}/quality_raw/{sample}_Forward/{sample}_R1_fastqc.html", sample=SAMPLE, prefix=PREFIX),
-        trim = expand("results/{prefix}/{sample}/trimmomatic/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
-        fastqc_aftertrim = expand("results/{prefix}/{sample}/quality_aftertrim/{sample}_Forward/{sample}_R1_trim_paired_fastqc.html", sample=SAMPLE, prefix=PREFIX),
-        downsample_read = expand("results/{prefix}/{sample}/downsample/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
-        spades_assembly = expand("results/{prefix}/{sample}/spades/contigs.fasta", sample=SAMPLE, prefix=PREFIX),
-        spades_l1000_assembly = expand("results/{prefix}/{sample}/spades/{sample}_contigs_l1000.fasta", sample=SAMPLE, prefix=PREFIX),
-        prokka_gff = expand("results/{prefix}/{sample}/prokka/{sample}.gff", sample=SAMPLE, prefix=PREFIX),
-        quast_report = expand("results/{prefix}/{sample}/quast/report.tsv", sample=SAMPLE, prefix=PREFIX),
-        #amrfinder = expand("results/{prefix}/{sample}/amrfinder/{sample}_amrfinder.tsv", sample=SAMPLE, prefix=PREFIX),
-        mlst_report = expand("results/{prefix}/{sample}/mlst/report.tsv", sample=SAMPLE, prefix=PREFIX),
-        #kraken_report = expand("results/{prefix}/{sample}/kraken/{sample}_kraken_report.tsv", sample=SAMPLE, prefix=PREFIX),
-        skani_ref_genome_results = expand("results/{prefix}/{sample}/skani/{sample}_skani_output.txt", sample=SAMPLE, prefix=PREFIX),
+        coverage = expand("results/{prefix}/raw_coverage/{sample}/{sample}_coverage.json", sample=SAMPLE, prefix=PREFIX),
+        fastqc_raw = expand("results/{prefix}/quality_raw/{sample}/{sample}_Forward/{sample}_R1_fastqc.html", sample=SAMPLE, prefix=PREFIX),
+        trim = expand("results/{prefix}/trimmomatic/{sample}/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
+        fastqc_aftertrim = expand("results/{prefix}/quality_aftertrim/{sample}/{sample}_Forward/{sample}_R1_trim_paired_fastqc.html", sample=SAMPLE, prefix=PREFIX),
+        downsample_read = expand("results/{prefix}/downsample/{sample}/{sample}_R1_trim_paired.fastq.gz", sample=SAMPLE, prefix=PREFIX),
+        spades_assembly = expand("results/{prefix}/spades/{sample}/contigs.fasta", sample=SAMPLE, prefix=PREFIX),
+        spades_l1000_assembly = expand("results/{prefix}/spades/{sample}/{sample}_contigs_l1000.fasta", sample=SAMPLE, prefix=PREFIX),
+        prokka_gff = expand("results/{prefix}/prokka/{sample}/{sample}.gff", sample=SAMPLE, prefix=PREFIX),
+        quast_report = expand("results/{prefix}/quast/{sample}/report.tsv", sample=SAMPLE, prefix=PREFIX),
+        mlst_report = expand("results/{prefix}/mlst/{sample}/report.tsv", sample=SAMPLE, prefix=PREFIX),
+        skani_ref_genome_results = expand("results/{prefix}/skani/{sample}/{sample}_skani_output.txt", sample=SAMPLE, prefix=PREFIX),
         coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
-        #kraken_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Kraken_report_final.csv", prefix=PREFIX),
         skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
         multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
         mlst_final_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
         QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
         QC_plot = expand("results/{prefix}/{prefix}_Report/fig/{prefix}_Coverage_distribution.png", prefix=PREFIX)
-
+        
 rule coverage:
     input:
         r1 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R1.fastq.gz")),
         r2 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R2.fastq.gz")),
     output:
-        coverage = f"results/{{prefix}}/{{sample}}/raw_coverage/{{sample}}_coverage.json",
+        coverage = f"results/{{prefix}}/raw_coverage/{{sample}}/{{sample}}_coverage.json",
     params:
         size=config["genome_size"]
     #conda:
@@ -147,12 +144,12 @@ rule quality_raw:
         r1 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R1.fastq.gz")),
         r2 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R2.fastq.gz")),
     output:
-        raw_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Forward/{{sample}}_R1_fastqc.html",
-        raw_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_raw/{{sample}}_Reverse/{{sample}}_R2_fastqc.html",
+        raw_fastqc_report_fwd = f"results/{{prefix}}/quality_raw/{{sample}}/{{sample}}_Forward/{{sample}}_R1_fastqc.html",
+        raw_fastqc_report_rev = f"results/{{prefix}}/quality_raw/{{sample}}/{{sample}}_Reverse/{{sample}}_R2_fastqc.html",
     log:
-        "logs/{prefix}/{sample}/quality_raw/{sample}.log"
+        "logs/{prefix}/quality_raw/{sample}/{sample}.log"
     params:
-        outdir="results/{prefix}/{sample}/quality_raw/{sample}"
+        outdir="results/{prefix}/quality_raw/{sample}/{sample}"
     #conda:
     #    "envs/fastqc.yaml"
     singularity:
@@ -161,18 +158,21 @@ rule quality_raw:
     #    "Bioinformatics",
     #    "fastqc"
     shell:
-        "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
+        """
+        mkdir -p {params.outdir}_Forward {params.outdir}_Reverse
+        fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}
+        """
 
 rule trimmomatic_pe:
     input:
         r1 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R1.fastq.gz")),
         r2 = lambda wildcards: expand(str(config["short_reads"] + "/" + f"{wildcards.sample}_R2.fastq.gz"))  
     output:
-        r1 = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R1_trim_paired.fastq.gz",
-        r2 = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R2_trim_paired.fastq.gz", 
+        r1 = f"results/{{prefix}}/trimmomatic/{{sample}}/{{sample}}_R1_trim_paired.fastq.gz",
+        r2 = f"results/{{prefix}}/trimmomatic/{{sample}}/{{sample}}_R2_trim_paired.fastq.gz", 
         # reads where trimming entirely removed the mate
-        r1_unpaired = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R1_trim_unpaired.fastq.gz",
-        r2_unpaired = f"results/{{prefix}}/{{sample}}/trimmomatic/{{sample}}_R2_trim_unpaired.fastq.gz",
+        r1_unpaired = f"results/{{prefix}}/trimmomatic/{{sample}}/{{sample}}_R1_trim_unpaired.fastq.gz",
+        r2_unpaired = f"results/{{prefix}}/trimmomatic/{{sample}}/{{sample}}_R2_trim_unpaired.fastq.gz",
     params:
         adapter_filepath=config["adapter_file"],
         seed=config["seed_mismatches"],
@@ -186,7 +186,7 @@ rule trimmomatic_pe:
         headcrop_length=config["headcrop_length"],
         threads = config["ncores"],
     log:
-        "logs/{prefix}/{sample}/trimmomatic/{sample}.log"
+        "logs/{prefix}/trimmomatic/{sample}/{sample}.log"
     #conda:
     #    "envs/trimmomatic.yaml"
     singularity:
@@ -199,15 +199,15 @@ rule trimmomatic_pe:
 
 rule quality_aftertrim:
     input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
+        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/trimmomatic/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
+        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/trimmomatic/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
     output:
-        aftertrim_fastqc_report_fwd = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Forward/{{sample}}_R1_trim_paired_fastqc.html",
-        aftertrim_fastqc_report_rev = f"results/{{prefix}}/{{sample}}/quality_aftertrim/{{sample}}_Reverse/{{sample}}_R2_trim_paired_fastqc.html",
+        aftertrim_fastqc_report_fwd = f"results/{{prefix}}/quality_aftertrim/{{sample}}/{{sample}}_Forward/{{sample}}_R1_trim_paired_fastqc.html",
+        aftertrim_fastqc_report_rev = f"results/{{prefix}}/quality_aftertrim/{{sample}}/{{sample}}_Reverse/{{sample}}_R2_trim_paired_fastqc.html",
     log:
         "logs/{prefix}/{sample}/quality_aftertrim/{sample}.log"
     params:
-        outdir="results/{prefix}/{sample}/quality_aftertrim/{sample}"
+        outdir="results/{prefix}/quality_aftertrim/{sample}/{sample}"
     #conda:
     #    "envs/fastqc.yaml"
     singularity:
@@ -216,15 +216,18 @@ rule quality_aftertrim:
     #    "Bioinformatics",
     #    "fastqc"
     shell:
-        "fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}"
+        """
+        mkdir -p {params.outdir}_Forward {params.outdir}_Reverse
+        fastqc -o {params.outdir}_Forward {input.r1} && fastqc -o {params.outdir}_Reverse {input.r2} &>{log}
+        """
 
 rule downsample:
     input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/trimmomatic/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
+        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/trimmomatic/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
+        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/trimmomatic/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
     output:
-        outr1 = f"results/{{prefix}}/{{sample}}/downsample/{{sample}}_R1_trim_paired.fastq.gz",
-        outr2 = f"results/{{prefix}}/{{sample}}/downsample/{{sample}}_R2_trim_paired.fastq.gz",
+        outr1 = f"results/{{prefix}}/downsample/{{sample}}/{{sample}}_R1_trim_paired.fastq.gz",
+        outr2 = f"results/{{prefix}}/downsample/{{sample}}/{{sample}}_R2_trim_paired.fastq.gz",
     params:
         gsize = config["genome_size"],
     run:
@@ -232,11 +235,11 @@ rule downsample:
 
 rule kraken:
     input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/downsample/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/downsample/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
+        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
+        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
     output:
-        kraken_out = f"results/{{prefix}}/{{sample}}/kraken/{{sample}}_kraken_out",
-        kraken_report = f"results/{{prefix}}/{{sample}}/kraken/{{sample}}_kraken_report.tsv",
+        kraken_out = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_out",
+        kraken_report = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_report.tsv",
     params:
         db = config["kraken_db"],
         threads = 12
@@ -250,12 +253,12 @@ rule kraken:
 
 rule assembly:
     input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/downsample/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/downsample/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
+        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
+        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
     output:
-        spades_assembly = f"results/{{prefix}}/{{sample}}/spades/contigs.fasta",
+        spades_assembly = f"results/{{prefix}}/spades/{{sample}}/contigs.fasta",
     params:
-        out_dir = "results/{prefix}/{sample}/spades/",
+        out_dir = "results/{prefix}/spades/{sample}/",
         db = config["kraken_db"],
     #conda:
     #    "envs/spades.yaml"
@@ -285,11 +288,11 @@ rule assembly:
 
 rule bioawk:
     input:
-        spades_assembly = lambda wildcards: f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta"
+        spades_assembly = lambda wildcards: f"results/{wildcards.prefix}/spades/{wildcards.sample}/contigs.fasta"
     output:
-        spades_l1000_assembly = "results/{prefix}/{sample}/spades/{sample}_contigs_l1000.fasta"
+        spades_l1000_assembly = "results/{prefix}/spades/{sample}/{sample}_contigs_l1000.fasta"
     params:
-        out_dir = "results/{prefix}/{sample}/spades/",
+        out_dir = "results/{prefix}/spades/{sample}/",
         bioawk_params = config["bioawk"],
         prefix = "{sample}"
     conda:
@@ -301,12 +304,12 @@ rule bioawk:
 
 rule prokka:
     input:
-        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
+        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/spades/{wildcards.sample}/{wildcards.sample}_contigs_l1000.fasta"),
     output:
-        prokka_gff = f"results/{{prefix}}/{{sample}}/prokka/{{sample}}.gff",
+        prokka_gff = f"results/{{prefix}}/prokka/{{sample}}/{{sample}}.gff",
     params: 
         prokka_params = config["prokka"],
-        outdir = "results/{prefix}/{sample}/prokka",
+        outdir = "results/{prefix}/prokka/{sample}",
         prefix = "{sample}",
     #conda:
     #    "envs/prokka.yaml"
@@ -320,11 +323,11 @@ rule prokka:
 
 rule quast:
     input:
-        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
+        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/spades/{wildcards.sample}/{wildcards.sample}_contigs_l1000.fasta"),
     output:
-        quast_report = f"results/{{prefix}}/{{sample}}/quast/report.tsv",
+        quast_report = f"results/{{prefix}}/quast/{{sample}}/report.tsv",
     params: 
-        outdir = "results/{prefix}/{sample}/quast",
+        outdir = "results/{prefix}/quast/{sample}/",
         prefix = "{sample}",
     #conda:
     #    "envs/quast.yaml"
@@ -334,15 +337,18 @@ rule quast:
     #    "Bioinformatics",
     #    "quast"
     shell:
-        "quast.py {input.spades_l1000_assembly} -o {params.outdir} --contig-thresholds 0,1000,5000,10000,25000,50000"
+        """
+        ./quast.sh {input.spades_l1000_assembly} {params.outdir} 
+        """
+        #"quast.py {input.spades_l1000_assembly} -o {params.outdir} --contig-thresholds 0,1000,5000,10000,25000,50000"
 
 rule mlst:
     input:
-        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
+        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/spades/{wildcards.sample}/{wildcards.sample}_contigs_l1000.fasta"),
     output:
-        mlst_report = f"results/{{prefix}}/{{sample}}/mlst/report.tsv",
+        mlst_report = f"results/{{prefix}}/mlst/{{sample}}/report.tsv",
     params: 
-        outdir = "results/{prefix}/{sample}/mlst",
+        outdir = "results/{prefix}/mlst/{sample}/",
         prefix = "{sample}",
     #conda:
     #    "envs/mlst.yaml"
@@ -372,11 +378,11 @@ rule mlst:
 
 rule busco:
     input:
-        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/{wildcards.sample}_contigs_l1000.fasta"),
+        spades_l1000_assembly = lambda wildcards: expand(f"results/{wildcards.prefix}/spades/{wildcards.sample}/{wildcards.sample}_contigs_l1000.fasta"),
     output:
         busco_out = f"results/{{prefix}}/{{sample}}/busco/busco.txt",
     params: 
-        outdir = "results/{prefix}/{sample}/busco",
+        outdir = "results/{prefix}/busco/{sample}/",
         prefix = "{sample}",
         threads = config["ncores"],
     #conda:
@@ -391,9 +397,9 @@ rule busco:
 
 rule skani:
     input:
-        spades_contigs_file = lambda wildcards: expand(f"results/{wildcards.prefix}/{wildcards.sample}/spades/contigs.fasta")
+        spades_contigs_file = lambda wildcards: expand(f"results/{wildcards.prefix}/spades/{wildcards.sample}/contigs.fasta")
     output:
-        skani_output = f"results/{{prefix}}/{{sample}}/skani/{{sample}}_skani_output.txt"
+        skani_output = f"results/{{prefix}}/skani/{{sample}}/{{sample}}_skani_output.txt"
     params:
         skani_ani_db = config["skani_db"],
         threads = 4
