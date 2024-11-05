@@ -29,7 +29,7 @@ jobs:
       - name: Install Singularity
         run: |
           sudo apt-get update
-          sudo apt-get install -y singularity-container
+          sudo apt-get install -y singularity
 
       - name: Run Snakemake tests
         run: |
