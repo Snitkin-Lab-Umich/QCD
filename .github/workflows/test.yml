@@ -33,5 +33,5 @@ jobs:
 
       - name: Run Snakemake tests
         run: |
-          pytest test_pipeline.py  
+          pytest tests/test_pipeline.py  
 
