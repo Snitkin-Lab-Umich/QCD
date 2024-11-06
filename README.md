@@ -86,26 +86,26 @@ This workflow makes use of singularity containers available through [State Publi
 **_If you are just testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
 
 ### Config
-As an input, the snakemake file takes a config file where you can set the path to `sample.tsv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
+As an input, the snakemake file takes a config file where you can set the path to `sample.csv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
 
 ### Samples
-Add samples to `config/sample.tsv` following the explanation provided below. `sample.tsv` should be a comma seperated file consisting of two columns—`sample_id` and `illumina_r1`.
+Add samples to `config/sample.csv` following the explanation provided below. `sample.csv` should be a comma seperated file consisting of two columns—`sample_id` and `illumina_r1`.
 
 * `sample_id` is the prefix that should be extracted from your FASTQ reads. For example, in  your raw FASTQ files directory, if you have a file called `Rush_KPC_110_R1.fastq.gz`, your sample_id would be `Rush_KPC_110`.
 
 * `illumina_r1` is the name of the entire raw FASTQ file. In the same directory,  if your file is called `Rush_KPC_110_R1.fastq.gz`, your sample_id would be `Rush_KPC_110_R1.fastq.gz`. **_Only include forward reads._**
 
-You can create sample.tsv file using the following for loop. Replace *path_to_your_raw_reads* below with the actual path to your raw sequencing reads.
+You can create sample.csv file using the following for loop. Replace *path_to_your_raw_reads* below with the actual path to your raw sequencing reads.
 
 ```
 
-echo "sample_id,illumina_r1" > config/sample.tsv
+echo "sample_id,illumina_r1" > config/sample.csv
 
 for read1 in path_to_your_raw_reads/*_R1.fastq.gz; do
     sample_id=$(basename $read1 | sed 's/_R1.fastq.gz//g')
     read1_basename=$(basename $read1)
     echo $sample_id,$read1_basename
-done >> config/sample.tsv
+done >> config/sample.csv
 
 ```
 
