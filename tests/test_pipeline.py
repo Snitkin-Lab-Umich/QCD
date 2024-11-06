@@ -18,7 +18,7 @@ def run_snakemake():
     assert result.returncode == 0, f"Snakemake failed with error: {result.stderr.decode()}"
 
 @pytest.mark.parametrize("sample", SAMPLE_LIST)
-def test_results_directory_structure():
+def test_results_directory_structure(sample):
     """Test if the output directory structure is created as expected."""
     # Base directory for your results
     base_dir = RESULTS_DIR
