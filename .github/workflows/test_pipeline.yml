@@ -28,16 +28,15 @@ jobs:
       - name: Get working directory
         run: |
           pwd
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: '3.10'  
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install seaborn --upgrade pip
-          pip install pytest snakemake seaborn
+          python-version: '3.10'
+          auto-update-conda: true
+          activate-environment: 'qcd_env'
+          environment-file: 'qcd_environment.yaml'
+          use-channel-priority: true
 
       - name: Install Singularity
         run: |
@@ -57,6 +56,3 @@ jobs:
           args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile config/config.yaml --latency-wait 1000'
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
-      #- name: Run Snakemake tests
-      #  run: |
-      #    pytest tests/test_pipeline.py
