@@ -1,14 +1,14 @@
 # Configuration settings for Snakemake
 
 # Relative path where your samples are found
-samples: config/sample.tsv
+samples: config/sample.csv
 
 # Path to your raw sequencing reads  
 short_reads: /nfs/turbo/umms-esnitkin/Github/test_data/fastq
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_QCD
-prefix: 2024-08-12_Project_Test_With_Singularity_QCD
+prefix: 2024-11-06_Project_Test_Pipeline_QCD
 
 # Change to genome size of your organism of interest 
 genome_size: 6000000
@@ -21,7 +21,7 @@ ncores: 4
 # Change according to your sequence type
 # If your adapter file is not present in the adapter directory, 
 # Please add the appropriate file to the adapters folder
-adapter_file: config/adapters/NexteraPE-PE.fa
+adapter_file: config/adapters/combined_Adaptors.fa
 seed_mismatches: 2
 palindrome_clipthreshold: 30
 simple_clipthreshold: 10
@@ -33,7 +33,7 @@ minlength: 40
 headcrop_length: 0
 
 # Optional to change this unless you have a kraken database of your own
-kraken_db: /nfs/esnitkin/bin_group/database/k2_standard_20230605/
+#kraken_db: /nfs/esnitkin/bin_group/database/k2_standard_20230605/
 
 # Do not change this
 bioawk: bioawk -c fastx '{if(length($seq) > 1000) {print ">"$name; print $seq }}'
