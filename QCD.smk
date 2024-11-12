@@ -241,7 +241,7 @@ rule kraken:
         kraken_out = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_out",
         kraken_report = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_report.tsv",
     params:
-        db = config["kraken_db"],
+        #db = config["kraken_db"],
         threads = 12
         # threads = config["threads"]
     #conda:
@@ -259,7 +259,7 @@ rule assembly:
         spades_assembly = f"results/{{prefix}}/spades/{{sample}}/contigs.fasta",
     params:
         out_dir = "results/{prefix}/spades/{sample}/",
-        db = config["kraken_db"],
+        #db = config["kraken_db"],
     #conda:
     #    "envs/spades.yaml"
     singularity:
