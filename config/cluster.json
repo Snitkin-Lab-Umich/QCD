@@ -5,7 +5,7 @@
      "partition": "standard",
      "nodes": 1,
      "procs": 6,
-     "pmem": "5GB",
+     "pmem": "10GB",
      "walltime": "6:00:00",
      "email": "dhatrib@umich.edu",
      "mail_type": "FAIL",
