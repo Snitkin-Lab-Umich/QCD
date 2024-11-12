@@ -115,6 +115,12 @@ Reduce the walltime (to ~6 hours) in `config/cluster.json` to ensure the jobs ar
 
 ## Quick start
 
+>  Start an interactive session before you run the pipeline. 
+
+```
+salloc --mem-per-cpu=10G --account=esnitkin1
+```
+
 ### Run QCD on a set of samples.
 
 > Preview the steps in QCD by performing a dryrun of the pipeline. 
@@ -140,7 +146,32 @@ snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
 snakemake -s QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
-> Submit QCD as a batch job (_coming soon!_)
+> Submit QCD as a batch job. 
+
+Change these `SBATCH` commands: `--job-name` to a more descriptive name like run_QCD, `--mail-user` to your email address, `--time` depending on the number of samples you have (should be more than what you specified in `cluster.json`). Feel free to make changes to the other flags if you are comfortable doing so. Once you have made the necessary changes, save the below script as `run_QCD.sbat`. Don't forget to submit QCD to Slurm! `sbatch run_QCD.sbat`.
+
+```
+#!/bin/bash
+
+#SBATCH --job-name=QCD
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=youremail@umich.edu
+#SBATCH --cpus-per-task=1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem-per-cpu=10gb
+#SBATCH --time=06:15:00
+#SBATCH --account=esnitkin1
+#SBATCH --partition=standard
+
+# Load necessary modules
+module load Bioinformatics
+module load snakemake singularity
+
+# Run Snakemake
+snakemake -s QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
+
+```
 
 ![Alt text](./QCD_dag.svg)
 <!--
@@ -183,7 +214,7 @@ snakemake -s QCD_report.smk -p --use-singularity --cores 2
 * [fastq-scan](https://github.com/rpetit3/fastq-scan)
 * [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
 * [SPades](https://github.com/ablab/spades)
-* [AMRFinderPlus](https://github.com/ncbi/amr)
+<!--* [AMRFinderPlus](https://github.com/ncbi/amr)-->
 * [bioawk](https://github.com/lh3/bioawk)
 * [Prokka](https://github.com/tseemann/prokka)
 * [mlst](https://github.com/tseemann/mlst)
