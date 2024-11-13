@@ -55,7 +55,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
       
       - name: Snakemake workflow
-        uses: snakemake/snakemake-github-action@v1
+        uses: snakemake/snakemake-github-action@v1.25.1
         with:
           directory: '.'
           snakefile: 'QCD.smk'
