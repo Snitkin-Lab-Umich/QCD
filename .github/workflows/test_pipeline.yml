@@ -49,15 +49,15 @@ jobs:
           conda activate qcd_env_test
           pip install --requirement requirements.txt
       
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       
       - name: Snakemake workflow
         uses: snakemake/snakemake-github-action@v1
         with:
           directory: '.'
           snakefile: 'QCD.smk'
-          args: 'snakemake -s QCD.smk --cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile config/config.yaml --latency-wait 1000'
+          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile config/config.yaml --latency-wait 1000'
       - run: echo "🍏 This job's status is ${{ job.status }}."
