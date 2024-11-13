@@ -45,7 +45,7 @@ jobs:
 
       - name: Install pip dependencies
         run: |
-          source ~/miniconda/etc/profile.d/conda.sh  # Initialize the shell for Conda
+          source $CONDA/bin/activate
           conda activate qcd_env_test
           pip install --requirement requirements.txt
 
