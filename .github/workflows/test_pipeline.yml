@@ -49,7 +49,7 @@ jobs:
           pip install --requirement requirements.txt
 
       - name: Snakemake workflow
-        uses: snakemake/snakemake-github-action@v3
+        uses: snakemake/snakemake-github-action@v1
         with:
           directory: '.'
           snakefile: 'QCD.smk'
