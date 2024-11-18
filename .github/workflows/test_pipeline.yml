@@ -57,7 +57,7 @@ jobs:
       - name: Snakemake workflow
         uses: snakemake/snakemake-github-action@v1.25.1
         with:
-          directory: '.'
+          #directory: '.'
           snakefile: 'QCD.smk'
           args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile config/config.yaml --latency-wait 1000'
       - run: echo "🍏 This job's status is ${{ job.status }}."
