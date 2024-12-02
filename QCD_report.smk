@@ -4,7 +4,7 @@
 import pandas as pd
 import os
 import json
-import seaborn as sns
+#import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import re
@@ -188,24 +188,24 @@ def summary(prefix, outdir):
         multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
     #multiqc_quast = multiqc_quast[["Sample", "N50", "Total length"]]
 
-    #def reformat_sample_name(name):
-    #    if '_S' in name:
-    #        # Replace underscores with dashes, but keep the format before the final _S
-    #        parts = name.rsplit('_S', 1)
-    #        if len(parts) == 2:
-    #            prefix = parts[0].replace('_', '-')
-    #            suffix = '_S' + parts[1]
-    #            return prefix + suffix
-    #    else:
-    #        return name    
+    def reformat_sample_name(name):
+       if '_S' in name:
+           # Replace underscores with dashes, but keep the format before the final _S
+           parts = name.rsplit('_S', 1)
+           if len(parts) == 2:
+               prefix = parts[0].replace('_', '-')
+               suffix = '_S' + parts[1]
+               return prefix + suffix
+       else:
+           return name    
     # Reformat the multiqc_quast df sample names
-    #multiqc_quast['Sample'] = multiqc_quast['Sample'].apply(reformat_sample_name)
+    multiqc_quast['Sample'] = multiqc_quast['Sample'].apply(reformat_sample_name)
 
     contig_distribution = pd.read_csv("results/%s/%s_Report/multiqc/%s_QC_report_data/mqc_quast_num_contigs_1.txt" % (prefix, prefix, prefix), sep='\t', header=0)
     contig_distribution = contig_distribution.replace(['_contigs_l1000'], '', regex=True)
     contig_distribution['Total # of contigs'] = contig_distribution.sum(axis=1, numeric_only=True)
     contig_distribution = contig_distribution[['Sample', 'Total # of contigs']]
-    #contig_distribution['Sample'] = contig_distribution['Sample'].apply(reformat_sample_name)
+    contig_distribution['Sample'] = contig_distribution['Sample'].apply(reformat_sample_name)
 
     #read final skani output file
     skani_summary = pd.read_csv("results/%s/%s_Report/data/%s_Skani_report_final.csv" % (prefix, prefix, prefix), sep=',', skipinitialspace=True, header=0, engine='python')
