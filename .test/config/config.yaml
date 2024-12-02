@@ -1,0 +1,60 @@
+# Configuration settings for Snakemake
+
+# Relative path where your samples are found
+samples: config/sample.csv
+
+# Path to your raw sequencing reads  
+short_reads: /nfs/turbo/umms-esnitkin/Github/test_data/fastq
+
+# Directory prefix where the outputs will be saved to
+# Rename this to your preferred naming convention with this format:year-month-day_Project_Name_QCD
+prefix: 2024-11-06_Project_Test_Pipeline_QCD
+
+# Change to genome size of your organism of interest 
+genome_size: 6000000
+
+# Cores used for busco and trimmomatic
+# Optional to change this
+ncores: 4
+
+# Command line parameters for trimmomatic tool
+# Change according to your sequence type
+# If your adapter file is not present in the adapter directory, 
+# Please add the appropriate file to the adapters folder
+adapter_file: config/adapters/combined_Adaptors.fa
+seed_mismatches: 2
+palindrome_clipthreshold: 30
+simple_clipthreshold: 10
+minadapterlength: 8
+keep_both_reads: true
+window_size: 4
+window_size_quality: 20
+minlength: 40
+headcrop_length: 0
+
+# Optional to change this unless you have a kraken database of your own
+#kraken_db: /nfs/esnitkin/bin_group/database/k2_standard_20230605/
+
+# Do not change this
+bioawk: bioawk -c fastx '{if(length($seq) > 1000) {print ">"$name; print $seq }}'
+
+# Command line parameters for Prokka 
+# Optional to change this
+prokka: -kingdom Bacteria --force --rfam
+
+# Change this to your organism of interest 
+# Check the website below for proper naming convention
+# https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus#--organism-option
+#amrfinder_organism: Klebsiella_pneumoniae
+
+# QC thresholds 
+min_contigs: 10
+max_contigs: 500
+assembly_length: 8000000
+coverage: 20
+
+# Skani database
+# Optional to change this unless you have a skani database of your own
+skani_db: /nfs/turbo/umms-esnitkin/database/skani/gtdb_skani_database_ani
+
+# Feel free to remove the comments after you have customized the file.
