@@ -21,6 +21,24 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
+      # Set up Dropbox CLI 
+      - name: Set up Dropbox CLI
+        run: |
+          curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
+          sudo dpkg -i dropbox.deb
+          sudo apt-get install -f
+      
+      - name: Authenticate with Dropbox
+        run: |
+          export DROPBOX_TOKEN=${{ secrets.DROPBOX_TOKEN }}
+          dropbox-cli start -i
+          dropbox-cli login $DROPBOX_TOKEN    
+      
+      # Download FASTQ files from Dropbox
+      - name: Download FASTQ files from Dropbox
+        run: |
+          dropbox-cli download "/Dhatri Badri Narayanan/Snitkin Lab Documents/Test-Pipelines" .test/data
+
       - name: List files in the repository
         run: |
           ls
