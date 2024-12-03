@@ -37,7 +37,16 @@ jobs:
           curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
           sudo dpkg -i dropbox.deb
           sudo apt-get install -f -y
+      
+      - name: Locate Dropbox CLI
+        run: |
+          sudo find / -name "dropbox-cli" || echo "Dropbox CLI not found"
         
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Authenticate with Dropbox
         run: |
           export DROPBOX_TOKEN=${{ secrets.DROPBOX_TOKEN }}
@@ -77,10 +86,6 @@ jobs:
           conda activate qcd_env_test
           pip install --requirement requirements.txt
       
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
       
       - name: Snakemake workflow
         # run: |
