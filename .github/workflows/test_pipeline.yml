@@ -25,6 +25,10 @@ jobs:
         run: |
           sudo sh -c 'echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/90-unprivileged_userns.conf'
           sudo sysctl -p /etc/sysctl.d/90-unprivileged_userns.conf
+          sudo sysctl --system
+          uname -r
+          sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
+          sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
 
       # Set up Dropbox CLI 
       # - name: Set up Dropbox CLI
