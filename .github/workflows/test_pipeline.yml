@@ -20,15 +20,6 @@ jobs:
         uses: actions/checkout@v3
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      
-      - name: Set up sysctl for unprivileged user namespaces
-        run: |
-          sudo sh -c 'echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/90-unprivileged_userns.conf'
-          sudo sysctl -p /etc/sysctl.d/90-unprivileged_userns.conf
-          sudo sysctl --system
-          uname -r
-          sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
-          sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
 
       # Set up Dropbox CLI 
       # - name: Set up Dropbox CLI
@@ -78,12 +69,7 @@ jobs:
           activate-environment: 'qcd_env_test'
           environment-file: 'qcd_environment.yaml'
           use-channel-priority: true
-        
-      - name: Install singularity
-        uses: eWaterCycle/setup-singularity@v7
-        with:
-          singularity-version: 3.8.3
-
+      
       - name: Install pip dependencies
         run: |
           source $CONDA/bin/activate
@@ -92,6 +78,32 @@ jobs:
           pip install dropbox
           pip install --upgrade tabulate
           pip install --upgrade snakemake
+        
+      - name: Install singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.3
+
+      # Diagnostic steps for Singularity capabilities 
+      - name: Install dependencies for Singularity
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y squashfuse fuse2fs gocryptf
+      
+      - name: Set up sysctl for unprivileged user namespaces
+        run: |
+          sudo sh -c 'echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/90-unprivileged_userns.conf'
+          sudo sysctl -p /etc/sysctl.d/90-unprivileged_userns.conf
+          sudo sysctl --system
+          uname -r
+          sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
+          sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
+
+      - name: Verify Singularity capabilities
+        run: |
+          singularity build --sandbox docker://ubuntu:20.04
+          singularity exec --userns docker://ubuntu:20.04 uname -a
+          singularity exec --userns docker://ubuntu:20.04 cat /proc/sys/kernel/unprivileged_userns_clone
       
       # # Debugging step: Print environment variables 
       # - name: Print environment variables
