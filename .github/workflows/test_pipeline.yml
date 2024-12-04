@@ -38,25 +38,20 @@ jobs:
           sudo dpkg -i dropbox.deb
           sudo apt-get install -f -y
       
-      - name: Locate Dropbox CLI
-        run: |
-          sudo find / -name "dropbox-cli" || echo "Dropbox CLI not found"
+      # - name: Locate Dropbox CLI
+      #   run: |
+      #     sudo find / -name "dropbox-cli" || echo "Dropbox CLI not found"
         
-      - name: SSh into Actions
-        uses: actions/checkout@v4
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
-      - name: Authenticate with Dropbox
-        run: |
-          export DROPBOX_TOKEN=${{ secrets.DROPBOX_TOKEN }}
-          dropbox-cli start -i
-          dropbox-cli login $DROPBOX_TOKEN    
-      
-      # Download FASTQ files from Dropbox
-      - name: Download FASTQ files from Dropbox
-        run: |
-          dropbox-cli download "/Dhatri Badri Narayanan/Snitkin Lab Documents/Test-Pipelines" .test/data
+      # - name: Authenticate with Dropbox
+      #   run: |
+      #     export DROPBOX_TOKEN=${{ secrets.DROPBOX_TOKEN }}
+      #     dropbox start -i
+      #     dropbox login $DROPBOX_TOKEN    
 
       - name: List files in the repository
         run: |
@@ -84,9 +79,18 @@ jobs:
         run: |
           source $CONDA/bin/activate
           conda activate qcd_env_test
-          pip install --requirement requirements.txt
+          pip install --requirement .test/requirements.txt
       
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       
+      # Download FASTQ files from Dropbox
+      - name: Download FASTQ files from Dropbox and copy it to local path
+        run: |
+          python3 download_fastqs.py
+
       - name: Snakemake workflow
         # run: |
         #   snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --cores 4 
