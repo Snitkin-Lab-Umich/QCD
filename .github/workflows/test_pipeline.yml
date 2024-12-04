@@ -121,5 +121,5 @@ jobs:
         with:
           directory: '.'
           snakefile: 'QCD.smk'
-          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
+          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --singularity-args "--userns"''
         #run: echo "🍏 This job's status is ${{ job.status }}."
