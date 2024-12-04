@@ -81,7 +81,13 @@ jobs:
           conda activate qcd_env_test
           pip install --requirement .test/requirements.txt
           pip install dropbox
+          pip install --upgrade tabulate
+          pip install --upgrade snakemake
       
+      # Debugging step: Print environment variables 
+      - name: Print environment variables
+        run: printenv
+
       # Download FASTQ files from Dropbox
       - name: Download FASTQ files from Dropbox and copy it to local path
         env:
@@ -89,6 +95,8 @@ jobs:
         run: |
           source $CONDA/bin/activate
           conda activate qcd_env_test
+          export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
+          echo "DROPBOX_ACCESS_TOKEN: $DROPBOX_ACCESS_TOKEN" 
           python3 download_fastqs.py
 
       - name: SSh into Actions
