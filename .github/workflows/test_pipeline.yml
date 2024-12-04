@@ -82,11 +82,6 @@ jobs:
           pip install --requirement .test/requirements.txt
           pip install dropbox
       
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      
       # Download FASTQ files from Dropbox
       - name: Download FASTQ files from Dropbox and copy it to local path
         env:
@@ -96,6 +91,11 @@ jobs:
           conda activate qcd_env_test
           python3 download_fastqs.py
 
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Snakemake workflow
         # run: |
         #   snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --cores 4 
@@ -103,5 +103,5 @@ jobs:
         with:
           #directory: '.'
           snakefile: 'QCD.smk'
-          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile config/config.yaml --latency-wait 1000'
+          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
         #run: echo "🍏 This job's status is ${{ job.status }}."
