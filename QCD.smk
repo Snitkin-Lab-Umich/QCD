@@ -16,8 +16,8 @@ SHORTREADS = list(samples_df['sample_id'])
 if not os.path.exists("results/"):
     os.system("mkdir %s" % "results/")
 
-if not os.path.exists("results/" + PREFIX):
-    os.system("mkdir %s" % "results/" + PREFIX)
+# if not os.path.exists("results/" + PREFIX):
+#     os.system("mkdir %s" % "results/" + PREFIX)
 
 def downsample_reads(file, file2, out1, out2, genome_size):
     file = file.pop()
