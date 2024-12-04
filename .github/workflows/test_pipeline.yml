@@ -22,21 +22,21 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
       # Set up Dropbox CLI 
-      - name: Set up Dropbox CLI
-        # run: |
-        #   curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
-        #   sudo dpkg -i dropbox.deb
-        #   sudo apt-get install -f
-        #   - name: Install Dropbox CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libpango1.0-0 \
-            gir1.2-gtk-3.0 \
-            gir1.2-pango-1.0
-          curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
-          sudo dpkg -i dropbox.deb
-          sudo apt-get install -f -y
+      # - name: Set up Dropbox CLI
+      #   # run: |
+      #   #   curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
+      #   #   sudo dpkg -i dropbox.deb
+      #   #   sudo apt-get install -f
+      #   #   - name: Install Dropbox CLI
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y \
+      #       libpango1.0-0 \
+      #       gir1.2-gtk-3.0 \
+      #       gir1.2-pango-1.0
+      #     curl -L https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb -o dropbox.deb
+      #     sudo dpkg -i dropbox.deb
+      #     sudo apt-get install -f -y
       
       # - name: Locate Dropbox CLI
       #   run: |
@@ -84,9 +84,9 @@ jobs:
           pip install --upgrade tabulate
           pip install --upgrade snakemake
       
-      # Debugging step: Print environment variables 
-      - name: Print environment variables
-        run: printenv
+      # # Debugging step: Print environment variables 
+      # - name: Print environment variables
+      #   run: printenv
 
       # Download FASTQ files from Dropbox
       - name: Download FASTQ files from Dropbox and copy it to local path
@@ -96,13 +96,12 @@ jobs:
           source $CONDA/bin/activate
           conda activate qcd_env_test
           export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
-          echo "DROPBOX_ACCESS_TOKEN: $DROPBOX_ACCESS_TOKEN" 
           python3 download_fastqs.py
 
-      - name: SSh into Actions
-        uses: actions/checkout@v4
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
       - name: Snakemake workflow
         # run: |
