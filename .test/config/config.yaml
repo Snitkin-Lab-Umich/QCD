@@ -1,14 +1,14 @@
 # Configuration settings for Snakemake
 
 # Relative path where your samples are found
-samples: config/sample.csv
+samples: .test/config/sample.csv
 
 # Path to your raw sequencing reads  
-short_reads: /nfs/turbo/umms-esnitkin/Github/test_data/fastq
+short_reads: .test/data
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_QCD
-prefix: 2024-11-06_Project_Test_Pipeline_QCD
+prefix: 2024-12-04_Project_Test_QCD_Pipeline
 
 # Change to genome size of your organism of interest 
 genome_size: 6000000
