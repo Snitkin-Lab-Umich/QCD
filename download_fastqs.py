@@ -2,7 +2,7 @@ import dropbox
 import os
 
 # Access Token
-ACCESS_TOKEN = 'sl.CB4c1IgQgBz0rVS3fblM35GnZZkdQwi6pDTkF3h6VSkTc4YgaTADD2SvkC-MtF7sKBsO4jen62MytzQz4DaWZEWzZ4XIBSEkyWUwaOtbRmQKZhBjUjGW21Ro3MLyvKIs50qJioZLV-hJBhI'
+ACCESS_TOKEN = os.getenv('DROPBOX_ACCESS_TOKEN')
 
 # Create a Dropbox client
 dbx = dropbox.Dropbox(ACCESS_TOKEN)
