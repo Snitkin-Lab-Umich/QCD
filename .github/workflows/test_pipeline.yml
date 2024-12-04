@@ -80,6 +80,7 @@ jobs:
           source $CONDA/bin/activate
           conda activate qcd_env_test
           pip install --requirement .test/requirements.txt
+          pip install dropbox
       
       # - name: SSh into Actions
       #   uses: actions/checkout@v4
