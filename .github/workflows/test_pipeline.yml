@@ -99,11 +99,11 @@ jobs:
           sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
           sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
 
-      - name: Verify Singularity capabilities
-        run: |
-          singularity build --sandbox docker://ubuntu:20.04
-          singularity exec --userns docker://ubuntu:20.04 uname -a
-          singularity exec --userns docker://ubuntu:20.04 cat /proc/sys/kernel/unprivileged_userns_clone
+      # - name: Verify Singularity capabilities
+      #   run: |
+      #     singularity build --sandbox docker://ubuntu:20.04
+      #     singularity exec --userns docker://ubuntu:20.04 uname -a
+      #     singularity exec --userns docker://ubuntu:20.04 cat /proc/sys/kernel/unprivileged_userns_clone
       
       # # Debugging step: Print environment variables 
       # - name: Print environment variables
