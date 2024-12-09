@@ -80,11 +80,11 @@ jobs:
         uses: eWaterCycle/setup-singularity@v7
         with:
           singularity-version: 3.8.3
-      - name: Export Singularity Path
-        run: |
-          export PATH=/home/runner/go/src/github.com/hpcng/singularity-3.8.3/prefix/bin:$PATH
-          echo "Singularity binary: $(which singularity)"
-          singularity --version
+      # - name: Export Singularity Path
+      #   run: |
+      #     export PATH=/home/runner/go/src/github.com/hpcng/singularity-3.8.3/prefix/bin:$PATH
+      #     echo "Singularity binary: $(which singularity)"
+      #     singularity --version
 
       # # Diagnostic steps for Singularity capabilities 
       # - name: Install dependencies for Singularity
@@ -138,14 +138,14 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
 
       - name: Snakemake workflow
-        # run: |
-        #   snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 --singularity-args "--userns"
-        uses: snakemake/snakemake-github-action@v1.25.1
-        with:
-          directory: '.'
-          snakefile: 'QCD.smk'
-          # stagein: ./mconfig --without-suid && \
-          #         make -C ./builddir && \
-          #         make -C ./builddir install
-          args: '--cores 4 --use-conda --use-docker --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --singularity-args "--fakeroot"'
+        run: |
+          snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 6 
+        # uses: snakemake/snakemake-github-action@v1.25.1
+        # with:
+        #   directory: '.'
+        #   snakefile: 'QCD.smk'
+        #   # stagein: ./mconfig --without-suid && \
+        #   #         make -C ./builddir && \
+        #   #         make -C ./builddir install
+        #   args: '--cores 4 --use-conda --use-docker --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --singularity-args "--fakeroot"'
         #run: echo "🍏 This job's status is ${{ job.status }}."
