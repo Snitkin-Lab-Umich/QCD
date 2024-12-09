@@ -47,31 +47,65 @@ jobs:
           pip install --upgrade tabulate
           pip install --upgrade snakemake
         
+      # - name: Install singularity
+      #   run: |
+      #     sudo apt-get install -y \
+      #      autoconf \
+      #      automake \
+      #      cryptsetup \
+      #      fuse \
+      #      fuse2fs \
+      #      git \
+      #      libfuse-dev \
+      #      libglib2.0-dev \
+      #      libseccomp-dev \
+      #      libtool \
+      #      pkg-config \
+      #      runc \
+      #      squashfs-tools \
+      #      squashfs-tools-ng \
+      #      uidmap \
+      #      wget \
+      #      zlib1g-dev 
+      
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      
+           # ./mconfig --without-suid && \
+           # make -C ./builddir && \
+           # make -C ./builddir install
       - name: Install singularity
         uses: eWaterCycle/setup-singularity@v7
         with:
           singularity-version: 3.8.3
+      # - name: Export Singularity Path
+      #   run: |
+      #     export PATH=/home/runner/go/src/github.com/hpcng/singularity-3.8.3/prefix/bin:$PATH
+      #     echo "Singularity binary: $(which singularity)"
+      #     singularity --version
 
-      # Diagnostic steps for Singularity capabilities 
-      - name: Install dependencies for Singularity
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y squashfuse fuse2fs gocryptfs
-      
-      - name: Set up sysctl for unprivileged user namespaces
-        run: |
-          sudo sh -c 'echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/90-unprivileged_userns.conf'
-          sudo sysctl -p /etc/sysctl.d/90-unprivileged_userns.conf
-          sudo sysctl --system
-          uname -r
-          sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
-          sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
+      # # Diagnostic steps for Singularity capabilities 
+      # - name: Install dependencies for Singularity
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install squashfuse fuse2fs gocryptfs
+
+      # - name: Set up sysctl for unprivileged user namespaces
+      #   run: |
+      #     sudo sh -c 'echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/90-unprivileged_userns.conf'
+      #     sudo sysctl -p /etc/sysctl.d/90-unprivileged_userns.conf
+      #     sudo sysctl --system
+      #     uname -r
+      #     sudo sh -c 'cat /proc/sys/kernel/unprivileged_userns_clone'
+      #     sudo sh -c 'ls /etc/sysctl.d/90-unprivileged_userns.conf'
 
       # - name: Verify Singularity capabilities
       #   run: |
-      #     singularity build --sandbox docker://ubuntu:20.04
-      #     singularity exec --userns docker://ubuntu:20.04 uname -a
-      #     singularity exec --userns docker://ubuntu:20.04 cat /proc/sys/kernel/unprivileged_userns_clone
+      #     singularity build --sandbox ubuntu_sandbox docker://ubuntu:20.04
+      #     singularity exec --userns ubuntu_sandbox uname -a
+      #     singularity exec --userns ubuntu_sandbox cat /proc/sys/kernel/unprivileged_userns_clone
       
       # # Debugging step: Print environment variables 
       # - name: Print environment variables
@@ -97,13 +131,23 @@ jobs:
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/quality_raw
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/trimmomatic
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/raw_coverage
+          
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
       - name: Snakemake workflow
-        # run: |
-        #   snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --cores 4 
-        uses: snakemake/snakemake-github-action@v1.25.1
-        with:
-          directory: '.'
-          snakefile: 'QCD.smk'
-          args: '--cores 4 --use-conda --use-singularity --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --singularity-args "--userns"'
+        run: |
+          source $CONDA/bin/activate
+          conda activate qcd_env_test
+          snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 6 
+        # uses: snakemake/snakemake-github-action@v1.25.1
+        # with:
+        #   directory: '.'
+        #   snakefile: 'QCD.smk'
+        #   # stagein: ./mconfig --without-suid && \
+        #   #         make -C ./builddir && \
+        #   #         make -C ./builddir install
+        #   args: '--cores 4 --use-conda --use-docker --use-envmodules --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --singularity-args "--fakeroot"'
         #run: echo "🍏 This job's status is ${{ job.status }}."
