@@ -235,23 +235,23 @@ rule downsample:
     wrapper:
         "file:wrapper_functions/downsample"
         
-rule kraken:
-    input:
-        r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
-        r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
-    output:
-        kraken_out = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_out",
-        kraken_report = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_report.tsv",
-    params:
-        #db = config["kraken_db"],
-        threads = 12
-        # threads = config["threads"]
-    #conda:
-    #    "envs/kraken.yaml"
-    singularity:
-        "docker://staphb/kraken2:2.1.3"
-    shell:
-        "kraken2 --db {params.db} --threads {params.threads} --paired --gzip-compressed --quick --output {output.kraken_out} --report {output.kraken_report} {input.r1} {input.r2}"
+# rule kraken:
+#     input:
+#         r1 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R1_trim_paired.fastq.gz"),
+#         r2 = lambda wildcards: expand(f"results/{wildcards.prefix}/downsample/{wildcards.sample}/" + f"{wildcards.sample}_R2_trim_paired.fastq.gz"),
+#     output:
+#         kraken_out = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_out",
+#         kraken_report = f"results/{{prefix}}/kraken/{{sample}}/{{sample}}_kraken_report.tsv",
+#     params:
+#         #db = config["kraken_db"],
+#         threads = 12
+#         # threads = config["threads"]
+#     #conda:
+#     #    "envs/kraken.yaml"
+#     singularity:
+#         "docker://staphb/kraken2:2.1.3"
+#     shell:
+#         "kraken2 --db {params.db} --threads {params.threads} --paired --gzip-compressed --quick --output {output.kraken_out} --report {output.kraken_report} {input.r1} {input.r2}"
 
 rule assembly:
     input:
@@ -262,6 +262,9 @@ rule assembly:
     params:
         out_dir = "results/{prefix}/spades/{sample}/",
         #db = config["kraken_db"],
+        threads: 10
+    resources:
+        mem_mb=32
     #conda:
     #    "envs/spades.yaml"
     singularity:
@@ -270,7 +273,7 @@ rule assembly:
     #    "Bioinformatics",
     #    "spades/4.0.0"
     shell:
-        "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir}"
+        "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir} --memory {resources.mem_mb} --threads {params.threads}"
 
 #rule bioawk:
 #    input:
@@ -404,7 +407,7 @@ rule skani:
         skani_output = f"results/{{prefix}}/skani/{{sample}}/{{sample}}_skani_output.txt"
     params:
         skani_ani_db = config["skani_db"],
-        threads = 4
+        threads = 6
     #conda:
     #    "envs/skani.yaml"
     singularity:
