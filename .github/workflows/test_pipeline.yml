@@ -139,6 +139,8 @@ jobs:
 
       - name: Snakemake workflow
         run: |
+          source $CONDA/bin/activate
+          conda activate qcd_env_test
           snakemake -s QCD.smk -p --use-conda --use-singularity -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 6 
         # uses: snakemake/snakemake-github-action@v1.25.1
         # with:
