@@ -9,13 +9,15 @@ import sys
 
 genome_size = snakemake.params.get("gsize", "")
 
-#{input.r1}, {input.r2}, {output.outr1}, {output.outr2}, {params.gsize}
-
 file = {snakemake.input.r1}
-file1 = {snakemake.input.r2}
-out1={snakemake.output.outr1}
-out2={snakemake.output.outr2}
-
+file2 = {snakemake.input.r2}
+outr1={snakemake.output.outr1}
+outr2={snakemake.output.outr2}
+# file = "/scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/2024-11-06_Project_Test_Pipeline_QCD/trimmomatic/Rush_KPC_110/Rush_KPC_110_R1_trim_paired.fastq.gz" 
+# file2="/scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/2024-11-06_Project_Test_Pipeline_QCD/trimmomatic/Rush_KPC_110/Rush_KPC_110_R2_trim_paired.fastq.gz"
+# outr1 ="/scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/2024-11-06_Project_Test_Pipeline_QCD/downsample/Rush_KPC_110/Rush_KPC_110_R1_trim_paired.fastq.gz" 
+# outr2="/scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/2024-11-06_Project_Test_Pipeline_QCD/downsample/Rush_KPC_110/Rush_KPC_110_R2_trim_paired.fastq.gz"
+# genome_size=6000000    
 
 def downsample_reads(file, file2, out1, out2, genome_size):
     file = file.pop()
@@ -25,7 +27,7 @@ def downsample_reads(file, file2, out1, out2, genome_size):
 
     # Extract basic fastq reads stats with seqtk
 
-    gsize = genome_size.pop()
+    gsize = genome_size
 
     print("Using Genome Size: %s to calculate coverage" % gsize)
     
@@ -101,3 +103,5 @@ def downsample_reads(file, file2, out1, out2, genome_size):
         r2_sub = file2
         os.system("cp %s %s" % (file, out1))
         os.system("cp %s %s" % (file2, out2))
+
+downsample_reads(file, file2, outr1, outr2, genome_size)
