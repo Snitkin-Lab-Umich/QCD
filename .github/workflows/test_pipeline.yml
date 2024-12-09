@@ -68,10 +68,10 @@ jobs:
       #      wget \
       #      zlib1g-dev 
       
-      - name: SSh into Actions
-        uses: actions/checkout@v4
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       
            # ./mconfig --without-suid && \
            # make -C ./builddir && \
