@@ -264,7 +264,7 @@ rule assembly:
         #db = config["kraken_db"],
         threads= 10
     resources:
-        mem_mb=32
+        mem_mb=100
     #conda:
     #    "envs/spades.yaml"
     singularity:
