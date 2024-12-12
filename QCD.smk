@@ -262,7 +262,7 @@ rule assembly:
     params:
         out_dir = "results/{prefix}/spades/{sample}/",
         #db = config["kraken_db"],
-        threads= 10
+        threads= 3
     resources:
         mem_mb=100
     #conda:
