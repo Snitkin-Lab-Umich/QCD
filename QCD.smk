@@ -263,8 +263,8 @@ rule assembly:
         out_dir = "results/{prefix}/spades/{sample}/",
         #db = config["kraken_db"],
         threads= 3
-    resources:
-        mem_mb=100
+    #resources:
+    #    mem_mb=100
     #conda:
     #    "envs/spades.yaml"
     singularity:
@@ -273,7 +273,7 @@ rule assembly:
     #    "Bioinformatics",
     #    "spades/4.0.0"
     shell:
-        "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir} --memory {resources.mem_mb} --threads {params.threads}"
+        "spades.py --isolate --pe1-1 {input.r1} --pe1-2 {input.r2} -o {params.out_dir} --threads {params.threads}" #--memory {resources.mem_mb}
 
 #rule bioawk:
 #    input:
