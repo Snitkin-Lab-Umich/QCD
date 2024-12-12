@@ -131,6 +131,7 @@ jobs:
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/quality_raw
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/trimmomatic
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/raw_coverage
+          mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/spades
           
       # - name: SSh into Actions
       #   uses: actions/checkout@v4
