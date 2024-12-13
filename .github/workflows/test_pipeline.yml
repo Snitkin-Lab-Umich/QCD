@@ -33,7 +33,8 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniconda-version: "latest"
+          CONDA: "/Users/Dhatrib/miniconda3"
+          #miniconda-version: "latest"
           python-version: '3.10'
           auto-update-conda: true
           activate-environment: 'qcd_env_test'
