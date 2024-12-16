@@ -45,7 +45,11 @@ jobs:
           environment-file: 'qcd_environment_shr.yaml'
           #use-channel-priority: true
           
-      
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Install pip dependencies
         run: |
           #source $CONDA/bin/activate
