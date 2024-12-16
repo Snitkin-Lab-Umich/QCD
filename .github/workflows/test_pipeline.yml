@@ -48,7 +48,7 @@ jobs:
       
       - name: Install pip dependencies
         run: |
-          source $CONDA/bin/activate
+          #source $CONDA/bin/activate
           conda activate qcd_env_test
           pip install --requirement .test/requirements.txt
           pip install dropbox
