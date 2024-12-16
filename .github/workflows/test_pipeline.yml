@@ -90,6 +90,11 @@ jobs:
            # ./mconfig --without-suid && \
            # make -C ./builddir && \
            # make -C ./builddir install
+      - name: Install Go
+        run: |
+          brew install go
+          go version
+          
       - name: Install singularity
         uses: eWaterCycle/setup-singularity@v7
         with:
