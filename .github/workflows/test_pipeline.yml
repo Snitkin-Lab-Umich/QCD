@@ -32,6 +32,8 @@ jobs:
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
+        env:
+          CONDA: "/Users/Dhatrib/miniconda3" 
         with:
           # export CONDA="/Users/Dhatrib/miniconda3"
           # export PATH="$CONDA/bin:$PATH"
