@@ -155,7 +155,8 @@ jobs:
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
         run: |
-          source /Users/Dhatrib/miniconda3/etc/profile.d/conda.sh
+          #source /Users/Dhatrib/miniconda3/etc/profile.d/conda.sh
+          source $CONDA/bin/activate
           conda activate qcd_env_test
           export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
           python3 download_fastqs.py
