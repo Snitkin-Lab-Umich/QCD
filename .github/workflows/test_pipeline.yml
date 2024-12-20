@@ -10,8 +10,8 @@ on:
 
 jobs:
   Test-QCD-Pipeline:
-    #runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    #runs-on: self-hosted
     steps:
       # - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       # - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -32,18 +32,15 @@ jobs:
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
-        env:
-          CONDA: "/Users/Dhatrib/miniconda3" 
+        # env:
+        #   CONDA: "/Users/Dhatrib/miniconda3" 
         with:
-          # export CONDA="/Users/Dhatrib/miniconda3"
-          # export PATH="$CONDA/bin:$PATH"
-          #CONDA: "/Users/Dhatrib/miniconda3"
           #miniconda-version: "latest"
           python-version: '3.10'
           auto-update-conda: true
           activate-environment: 'qcd_env_test'
           environment-file: 'qcd_environment_shr.yaml'
-          #use-channel-priority: true
+          use-channel-priority: true
           
       # - name: SSh into Actions
       #   uses: actions/checkout@v4
@@ -52,8 +49,9 @@ jobs:
 
       - name: Install pip dependencies
         run: |
-          source /Users/Dhatrib/miniconda3/etc/profile.d/conda.sh
-          conda init
+          #source /Users/Dhatrib/miniconda3/etc/profile.d/conda.sh
+          #conda init
+          source $CONDA/bin/activate
           conda activate qcd_env_test
           pip install --requirement .test/requirements.txt
           pip install dropbox
@@ -90,37 +88,37 @@ jobs:
            # ./mconfig --without-suid && \
            # make -C ./builddir && \
            # make -C ./builddir install
-      - name: Install Go
-        run: |
-          brew install go
-          go version
+      # - name: Install Go
+      #   run: |
+      #     brew install go
+      #     go version
           
-      - name: Install dependencies using Homebrew
-        run: |
-          brew install wget
-          brew install go 
-          brew install squashfs
+      # - name: Install dependencies using Homebrew
+      #   run: |
+      #     brew install wget
+      #     brew install go 
+      #     brew install squashfs
         
-      - name: Download Singularity
-        run: |
-          wget https://github.com/sylabs/singularity/archive/refs/tags/v3.8.3.tar.gz
-          tar -xzf singularity-3.8.3.tar.gz
+      # - name: Download Singularity
+      #   run: |
+      #     wget https://github.com/sylabs/singularity/archive/refs/tags/v3.8.3.tar.gz
+      #     tar -xzf singularity-3.8.3.tar.gz
 
-      - name: Install Singularity
-        run: |
-          cd singularity
-          ./mconfig
-          make -C builddir
-          sudo make -C builddir install
+      # - name: Install Singularity
+      #   run: |
+      #     cd singularity
+      #     ./mconfig
+      #     make -C builddir
+      #     sudo make -C builddir install
 
-      - name: Verify Singularity installation
-        run: singularity --version
+      # - name: Verify Singularity installation
+      #   run: singularity --version
         
         #https://github.com/sylabs/singularity/archive/refs/tags/v3.8.3.tar.gz    
-      # - name: Install singularity
-      #   uses: eWaterCycle/setup-singularity@v7
-      #   with:
-      #     singularity-version: 3.8.3
+      - name: Install singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.3
       # - name: Export Singularity Path
       #   run: |
       #     export PATH=/home/runner/go/src/github.com/hpcng/singularity-3.8.3/prefix/bin:$PATH
