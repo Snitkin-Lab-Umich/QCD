@@ -121,8 +121,8 @@ jobs:
           singularity-version: 3.8.3
       - name: Configure Singularity
         run: |
-          sudo singularity config global --set "allow setuid = no"
-          sudo singularity config global --set "enable overlay = yes"
+          singularity config global --set "allow setuid = no"
+          singularity config global --set "enable overlay = yes"
       # - name: Export Singularity Path
       #   run: |
       #     export PATH=/home/runner/go/src/github.com/hpcng/singularity-3.8.3/prefix/bin:$PATH
