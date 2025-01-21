@@ -141,7 +141,7 @@ jobs:
         #   source $CONDA/bin/activate
         #   conda activate qcd_env_test
         #   snakemake -s QCD.smk -p --use-conda --use-singularity --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 
-        # uses: snakemake/snakemake-github-action@v1.25.1
+        uses: snakemake/snakemake-github-action@v1.25.1
         with:
           directory: '.'
           snakefile: 'QCD.smk'
