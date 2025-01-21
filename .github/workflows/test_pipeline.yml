@@ -82,10 +82,10 @@ jobs:
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/raw_coverage
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/spades
           
-      - name: SSh into Actions
-        uses: actions/checkout@v4
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
       - name: Snakemake workflow
         run: |
