@@ -148,6 +148,6 @@ jobs:
           # stagein: ./mconfig --without-suid && \
           #         make -C ./builddir && \
           #         make -C ./builddir install
-          task: 'containerize'
+          show-disk-usage-on-error: true
           args: '--cores 4 --use-conda --use-singularity --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000' 
         #run: echo "🍏 This job's status is ${{ job.status }}."
