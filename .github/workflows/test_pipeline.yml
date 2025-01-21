@@ -87,11 +87,11 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
 
-      # - name: Snakemake workflow
-        # run: |
-        #   source $CONDA/bin/activate
-        #   conda activate qcd_env_test
-        #   snakemake -s QCD.smk -p --use-conda --use-singularity --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 
+      - name: Snakemake workflow
+        run: |
+          source $CONDA/bin/activate
+          conda activate qcd_env_test
+          snakemake -s QCD.smk -p --use-conda --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 
         # uses: snakemake/snakemake-github-action@v1.25.1
         # with:
         #   directory: '.'
