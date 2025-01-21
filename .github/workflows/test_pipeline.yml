@@ -145,6 +145,7 @@ jobs:
         with:
           directory: '.'
           snakefile: 'QCD.smk'
+          stagein: 'sudo apt-get install squashfuse fuse2fs gocryptfs'
           # stagein: ./mconfig --without-suid && \
           #         make -C ./builddir && \
           #         make -C ./builddir install
