@@ -82,26 +82,26 @@ jobs:
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/raw_coverage
           mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/spades
           
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
-      - name: Snakemake workflow
+      # - name: Snakemake workflow
         # run: |
         #   source $CONDA/bin/activate
         #   conda activate qcd_env_test
         #   snakemake -s QCD.smk -p --use-conda --use-singularity --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 
-        uses: snakemake/snakemake-github-action@v1.25.1
-        with:
-          directory: '.'
-          snakefile: 'QCD.smk'
-          # install-apptainer: true
-          task: 'run'
-          # stagein: 'sudo apt-get install squashfuse fuse2fs gocryptfs'
-          # stagein: ./mconfig --without-suid && \
-          #         make -C ./builddir && \
-          #         make -C ./builddir install
-          # show-disk-usage-on-error: true
-          args: '--cores 4 --use-conda --use-apptainer --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000' 
+        # uses: snakemake/snakemake-github-action@v1.25.1
+        # with:
+        #   directory: '.'
+        #   snakefile: 'QCD.smk'
+        #   # install-apptainer: true
+        #   task: 'run'
+        #   # stagein: 'sudo apt-get install squashfuse fuse2fs gocryptfs'
+        #   # stagein: ./mconfig --without-suid && \
+        #   #         make -C ./builddir && \
+        #   #         make -C ./builddir install
+        #   # show-disk-usage-on-error: true
+        #   args: '--cores 4 --use-conda --use-apptainer --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000' 
         #run: echo "🍏 This job's status is ${{ job.status }}."
