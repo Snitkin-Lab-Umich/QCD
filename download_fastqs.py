@@ -22,8 +22,8 @@ def download_files_from_dropbox(files_to_download):
 files_to_download = [
     ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_110_r1.fastq.gz', '.test/data/Rush_KPC_110_R1.fastq.gz'),
     ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_110_r2.fastq.gz', '.test/data/Rush_KPC_110_R2.fastq.gz'),
-    ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_111_r1.fastq.gz', '.test/data/Rush_KPC_111_R1.fastq.gz'),
-    ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_111_r2.fastq.gz', '.test/data/Rush_KPC_111_R2.fastq.gz')
+    # ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_111_r1.fastq.gz', '.test/data/Rush_KPC_111_R1.fastq.gz'),
+    # ('/snitkin lab documents/test-pipelines/test-qcd/rush_kpc_111_r2.fastq.gz', '.test/data/Rush_KPC_111_R2.fastq.gz')
     # Add more files as needed
 ]
 
