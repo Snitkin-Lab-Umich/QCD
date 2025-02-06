@@ -224,11 +224,12 @@ def summary(prefix, outdir):
     (QC_summary_temp7['Total # of contigs'] > config["max_contigs"]),
     (QC_summary_temp7['Total # of contigs'] < config["min_contigs"]),
     (QC_summary_temp7['Total length'] > config["assembly_length"]),
+    (QC_summary_temp7['Total length'] < config["genome_size"]), 
     (QC_summary_temp7['Coverage'] < config["coverage"]),
     (QC_summary_temp7['Total # of contigs'].isnull()),
     ]
 
-    status = ['FAIL', 'FAIL', 'FAIL', 'FAIL', "Run FAIL"]
+    status = ['FAIL', 'FAIL', 'FAIL', 'FAIL', 'FAIL', "Run FAIL"]
 
     QC_summary_temp7['QC Check'] = np.select(QC_check_condition, status, default='PASS')
 
