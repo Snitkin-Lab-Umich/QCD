@@ -51,10 +51,13 @@ prokka: -kingdom Bacteria --force --rfam
 min_contigs: 10
 max_contigs: 500
 assembly_length: 8000000
-coverage: 20
+coverage: 50
 
 # Skani database
 # Optional to change this unless you have a skani database of your own
 skani_db: /nfs/turbo/umms-esnitkin/database/skani/gtdb_skani_database_ani
+
+# Genome sizes of some bacteria species
+skani_genome_size: config/species_freq.csv
 
 # Feel free to remove the comments after you have customized the file.
