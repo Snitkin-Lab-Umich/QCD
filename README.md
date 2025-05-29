@@ -28,28 +28,6 @@ results/2025-05-29_Project_MRSA_QCD/
 │   │   └── 2025-05-29_Project_MRSA_QCD_Skani_report_final.csv
 │   ├── fig
 │   ├── multiqc
-│   │   ├── 2025-05-29_Project_MRSA_QCD_QC_report_data
-│   │   │   ├── multiqc_citations.txt
-│   │   │   ├── multiqc_data.json
-│   │   │   ├── multiqc_fastqc.txt
-│   │   │   ├── multiqc_general_stats.txt
-│   │   │   ├── multiqc.log
-│   │   │   ├── multiqc_prokka.txt
-│   │   │   ├── multiqc_quast.txt
-│   │   │   ├── multiqc_software_versions.txt
-│   │   │   └── multiqc_sources.txt
-│   │   ├── 2025-05-29_Project_MRSA_QCD_QC_report.html
-│   │   └── 2025-05-29_Project_MRSA_QCD_QC_report_plots
-│   │       ├── pdf
-│   │       │   ├── mqc_fastqc_per_base_n_content_plot_1.pdf
-│   │       │   ├── mqc_fastqc_per_base_sequence_quality_plot_1.pdf
-│   │       │   └── mqc_fastqc_per_sequence_gc_content_plot_Counts.pdf
-│   │       ├── png
-│   │       │   ├── mqc_fastqc_per_base_n_content_plot_1.png
-│   │       │   └── mqc_fastqc_per_base_sequence_quality_plot_1.png
-│   │       └── svg
-│   │           ├── mqc_fastqc_per_base_n_content_plot_1.svg
-│   │           └── mqc_fastqc_per_base_sequence_quality_plot_1.svg
 ├── downsample
 │   ├── MRSA_jail_100
 │   │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz
@@ -62,74 +40,36 @@ results/2025-05-29_Project_MRSA_QCD/
 │       └── report.tsv
 ├── prokka
 │   └── MRSA_jail_100
-│       ├── MRSA_jail_100.err
-│       ├── MRSA_jail_100.faa
-│       ├── MRSA_jail_100.ffn
-│       ├── MRSA_jail_100.fna
-│       ├── MRSA_jail_100.fsa
 │       ├── MRSA_jail_100.gbk
 │       ├── MRSA_jail_100.gff
-│       ├── MRSA_jail_100.log
-│       ├── MRSA_jail_100.sqn
-│       ├── MRSA_jail_100.tbl
-│       ├── MRSA_jail_100.tsv
 │       └── MRSA_jail_100.txt
 ├── quality_aftertrim
 │   ├── MRSA_jail_100
 │   │   ├── MRSA_jail_100_Forward
 │   │   │   ├── MRSA_jail_100_R1_trim_paired_fastqc.html
 │   │   │   └── MRSA_jail_100_R1_trim_paired_fastqc.zip
-│   │   └── MRSA_jail_100_Reverse
-│   │       ├── MRSA_jail_100_R2_trim_paired_fastqc.html
-│   │       └── MRSA_jail_100_R2_trim_paired_fastqc.zip
 ├── quality_raw
 │   ├── MRSA_jail_100
 │   │   ├── MRSA_jail_100_Forward
 │   │   │   ├── MRSA_jail_100_R1_fastqc.html
 │   │   │   └── MRSA_jail_100_R1_fastqc.zip
-│   │   └── MRSA_jail_100_Reverse
-│   │       ├── MRSA_jail_100_R2_fastqc.html
-│   │       └── MRSA_jail_100_R2_fastqc.zip
 ├── quast
 │   └── MRSA_jail_100
-│       ├── basic_stats
-│       │   ├── cumulative_plot.pdf
-│       ├── quast.log
-│       ├── report.html
-│       ├── report.pdf
-│       ├── report.tex
-│       ├── report.tsv
-│       ├── report.txt
-│       ├── transposed_report.tex
-│       ├── transposed_report.tsv
 │       └── transposed_report.txt
 ├── raw_coverage
 │   ├── MRSA_jail_100
 │   │   └── MRSA_jail_100_coverage.json
-├── sample_files
-│   ├── samples_failed_assembly_summary.csv
-│   ├── samples_failed_coverage_summary.csv
-│   ├── samples_passed_assembly.csv
-│   ├── samples_passed_coverage.csv
-│   └── updated_samples_passed_coverage.done
 ├── skani
 │   └── MRSA_jail_100
 │       └── MRSA_jail_100_skani_output.txt
 ├── spades
 │   ├── MRSA_jail_100
-│   │   ├── assembly_graph_after_simplification.gfa
-│   │   ├── assembly_graph.fastg
-│   │   ├── assembly_graph_with_scaffolds.gfa
-│   │   ├── before_rr.fasta
 │   │   ├── contigs.fasta
 │   │   └── MRSA_jail_100_contigs_l1000.fasta
 └── trimmomatic
     ├── MRSA_jail_100
     │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz
-    │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz_fastqchk.txt
-    │   ├── MRSA_jail_100_R1_trim_unpaired.fastq.gz
-    │   ├── MRSA_jail_100_R2_trim_paired.fastq.gz
-    │   └── MRSA_jail_100_R2_trim_unpaired.fastq.gz
+    │   └── MRSA_jail_100_R2_trim_paired.fastq.gz
 
 ```
 
