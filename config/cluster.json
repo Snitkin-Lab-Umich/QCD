@@ -6,8 +6,8 @@
      "nodes": 1,
      "procs": 8,
      "pmem": "10GB",
-     "walltime": "04:00:00",
-     "email": "dhatrib@umich.edu",
+     "walltime": "08:00:00",
+     "email": "youremail@umich.edu",
      "mail_type": "FAIL",
      "output": "logs/cluster/{rule}.{wildcards}.out",
      "error": "logs/cluster/{rule}.{wildcards}.err"
