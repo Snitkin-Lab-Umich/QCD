@@ -4,7 +4,7 @@ QCD is a workflow for microbial Illumina sequencing quality control and contamin
 
 ### Summary
 
-As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), this pipeline should be run on raw sequencing data as soon as the data is available from the sequencing core department. 
+As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), this pipeline should be run on raw sequencing data as soon as the data is available from the sequencing core. 
 
 In short, it performs the following steps:
 
