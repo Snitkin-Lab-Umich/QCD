@@ -1,0 +1,10 @@
+name: spades
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - spades
+  - ruamel.yaml
+  - python=3.10
+  - pandas
