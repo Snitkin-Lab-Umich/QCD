@@ -12,27 +12,125 @@ In short, it performs the following steps:
 * Trims and filters low-quality bases and adapter sequences from raw FASTQ reads using [Trimmomatic](https://github.com/usadellab/Trimmomatic).
 * [fastq-scan](https://github.com/rpetit3/fastq-scan) is used to estimate genome coverage of FASTQ files.
 * Assembles trimmed reads into contigs using [SPAdes](https://github.com/ablab/spades).
-* [Kraken2](https://github.com/DerrickWood/kraken2) is used to provide detailed reports on the taxonomic composition of the trimmed raw reads.
-* The assembled contigs from [SPAdes](https://github.com/ablab/spades) is then passed through [Prokka](https://github.com/tseemann/prokka) for annotation, [QUAST](https://quast.sourceforge.net/) for assembly statistics, [MLST](https://github.com/tseemann/mlst) for determining sequence type based on sequences of housekeeping genes, [AMRFinderPlus](https://github.com/ncbi/amr) to identify antimicrobial resistance genes, [skani](https://github.com/bluenote-1577/skani) to identify closest reference genome and [BUSCO](https://busco.ezlab.org/) for assembly completeness statistics.
-* [Multiqc](https://github.com/MultiQC/MultiQC) aggregates the final outputs from [Fastqc](https://github.com/s-andrews/FastQC), [Kraken2](https://github.com/DerrickWood/kraken2) , [Prokka](https://github.com/tseemann/prokka) and [QUAST](https://quast.sourceforge.net/) to produce a HTML report
+* The assembled contigs from [SPAdes](https://github.com/ablab/spades) is then passed through [Prokka](https://github.com/tseemann/prokka) for annotation, [QUAST](https://quast.sourceforge.net/) for assembly statistics, [MLST](https://github.com/tseemann/mlst) for determining sequence type based on sequences of housekeeping genes, [skani](https://github.com/bluenote-1577/skani) to identify closest reference genome and [BUSCO](https://busco.ezlab.org/) for assembly completeness statistics.
+* [Multiqc](https://github.com/MultiQC/MultiQC) aggregates the final outputs from [Fastqc](https://github.com/s-andrews/FastQC), [Prokka](https://github.com/tseemann/prokka) and [QUAST](https://quast.sourceforge.net/) to produce a HTML report.
+* The final step in the pipeline is to generate a QC report that will specify which samples have passed or failed the pipeline.
 
-The workflow generates all the output in the output prefix folder set in the config file (instructions on setup found [below](#config)). Each workflow steps gets its own individual folder as shown:
+The workflow generates all the output in the output prefix folder set in the config file (instructions on setup found [below](#config)). Each workflow steps gets its own individual folder as shown. **Note that this overview does not capture all possible outputs from each tool; it only highlights the primary directories and some of their contents.**
 
 ```
-results/2024-05-21_QCD_Project_MDHHS/
-|—— sample_name
-|   ├── amrfinder
-|   ├── downsample
-|   ├── kraken
-|   ├── mlst
-|   ├── prokka
-|   ├── quality_aftertrim
-|   ├── quality_raw
-|   ├── quast
-|   ├── raw_coverage
-|   ├── spades
-|   └── trimmomatic
-└── another_sample_name
+results/2025-05-29_Project_MRSA_QCD/
+├── 2025-05-29_Project_MRSA_QCD_Report
+│   ├── data
+│   │   ├── 2025-05-29_Project_MRSA_QCD_Final_Coverage.txt
+│   │   ├── 2025-05-29_Project_MRSA_QCD_MLST_results.csv
+│   │   ├── 2025-05-29_Project_MRSA_QCD_QC_summary.csv
+│   │   └── 2025-05-29_Project_MRSA_QCD_Skani_report_final.csv
+│   ├── fig
+│   ├── multiqc
+│   │   ├── 2025-05-29_Project_MRSA_QCD_QC_report_data
+│   │   │   ├── multiqc_citations.txt
+│   │   │   ├── multiqc_data.json
+│   │   │   ├── multiqc_fastqc.txt
+│   │   │   ├── multiqc_general_stats.txt
+│   │   │   ├── multiqc.log
+│   │   │   ├── multiqc_prokka.txt
+│   │   │   ├── multiqc_quast.txt
+│   │   │   ├── multiqc_software_versions.txt
+│   │   │   └── multiqc_sources.txt
+│   │   ├── 2025-05-29_Project_MRSA_QCD_QC_report.html
+│   │   └── 2025-05-29_Project_MRSA_QCD_QC_report_plots
+│   │       ├── pdf
+│   │       │   ├── mqc_fastqc_per_base_n_content_plot_1.pdf
+│   │       │   ├── mqc_fastqc_per_base_sequence_quality_plot_1.pdf
+│   │       │   └── mqc_fastqc_per_sequence_gc_content_plot_Counts.pdf
+│   │       ├── png
+│   │       │   ├── mqc_fastqc_per_base_n_content_plot_1.png
+│   │       │   └── mqc_fastqc_per_base_sequence_quality_plot_1.png
+│   │       └── svg
+│   │           ├── mqc_fastqc_per_base_n_content_plot_1.svg
+│   │           └── mqc_fastqc_per_base_sequence_quality_plot_1.svg
+├── downsample
+│   ├── MRSA_jail_100
+│   │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz
+│   │   └── MRSA_jail_100_R2_trim_paired.fastq.gz
+│   └── MRSA_jail_275
+│       ├── MRSA_jail_275_R1_trim_paired.fastq.gz
+│       └── MRSA_jail_275_R2_trim_paired.fastq.gz
+├── mlst
+│   └── MRSA_jail_100
+│       └── report.tsv
+├── prokka
+│   └── MRSA_jail_100
+│       ├── MRSA_jail_100.err
+│       ├── MRSA_jail_100.faa
+│       ├── MRSA_jail_100.ffn
+│       ├── MRSA_jail_100.fna
+│       ├── MRSA_jail_100.fsa
+│       ├── MRSA_jail_100.gbk
+│       ├── MRSA_jail_100.gff
+│       ├── MRSA_jail_100.log
+│       ├── MRSA_jail_100.sqn
+│       ├── MRSA_jail_100.tbl
+│       ├── MRSA_jail_100.tsv
+│       └── MRSA_jail_100.txt
+├── quality_aftertrim
+│   ├── MRSA_jail_100
+│   │   ├── MRSA_jail_100_Forward
+│   │   │   ├── MRSA_jail_100_R1_trim_paired_fastqc.html
+│   │   │   └── MRSA_jail_100_R1_trim_paired_fastqc.zip
+│   │   └── MRSA_jail_100_Reverse
+│   │       ├── MRSA_jail_100_R2_trim_paired_fastqc.html
+│   │       └── MRSA_jail_100_R2_trim_paired_fastqc.zip
+├── quality_raw
+│   ├── MRSA_jail_100
+│   │   ├── MRSA_jail_100_Forward
+│   │   │   ├── MRSA_jail_100_R1_fastqc.html
+│   │   │   └── MRSA_jail_100_R1_fastqc.zip
+│   │   └── MRSA_jail_100_Reverse
+│   │       ├── MRSA_jail_100_R2_fastqc.html
+│   │       └── MRSA_jail_100_R2_fastqc.zip
+├── quast
+│   └── MRSA_jail_100
+│       ├── basic_stats
+│       │   ├── cumulative_plot.pdf
+│       ├── quast.log
+│       ├── report.html
+│       ├── report.pdf
+│       ├── report.tex
+│       ├── report.tsv
+│       ├── report.txt
+│       ├── transposed_report.tex
+│       ├── transposed_report.tsv
+│       └── transposed_report.txt
+├── raw_coverage
+│   ├── MRSA_jail_100
+│   │   └── MRSA_jail_100_coverage.json
+├── sample_files
+│   ├── samples_failed_assembly_summary.csv
+│   ├── samples_failed_coverage_summary.csv
+│   ├── samples_passed_assembly.csv
+│   ├── samples_passed_coverage.csv
+│   └── updated_samples_passed_coverage.done
+├── skani
+│   └── MRSA_jail_100
+│       └── MRSA_jail_100_skani_output.txt
+├── spades
+│   ├── MRSA_jail_100
+│   │   ├── assembly_graph_after_simplification.gfa
+│   │   ├── assembly_graph.fastg
+│   │   ├── assembly_graph_with_scaffolds.gfa
+│   │   ├── before_rr.fasta
+│   │   ├── contigs.fasta
+│   │   └── MRSA_jail_100_contigs_l1000.fasta
+└── trimmomatic
+    ├── MRSA_jail_100
+    │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz
+    │   ├── MRSA_jail_100_R1_trim_paired.fastq.gz_fastqchk.txt
+    │   ├── MRSA_jail_100_R1_trim_unpaired.fastq.gz
+    │   ├── MRSA_jail_100_R2_trim_paired.fastq.gz
+    │   └── MRSA_jail_100_R2_trim_unpaired.fastq.gz
+
 ```
 
 
@@ -86,26 +184,26 @@ This workflow makes use of singularity containers available through [State Publi
 **_If you are just testing this pipeline, the config and sample files are already loaded with test data, so you do not need to make any additional changes to them. However, it is a good idea to change the prefix (name of your output folder) in the config file to give you an idea of what variables need to be modified when running your own samples on QCD._**
 
 ### Config
-As an input, the snakemake file takes a config file where you can set the path to `sample.csv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
+As an input, the snakemake file takes a config file where you can set the path to `samples.csv`, path to your raw sequencing reads, path to adapter fasta file etc. Instructions on how to modify `config/config.yaml` is found in `config.yaml`. 
 
 ### Samples
-Add samples to `config/sample.csv` following the explanation provided below. `sample.csv` should be a comma seperated file consisting of two columns—`sample_id` and `illumina_r1`.
+Add samples to `config/samples.csv` following the explanation provided below. `samples.csv` should be a comma seperated file consisting of two columns—`sample_id` and `illumina_r1`.
 
 * `sample_id` is the prefix that should be extracted from your FASTQ reads. For example, in  your raw FASTQ files directory, if you have a file called `Rush_KPC_110_R1.fastq.gz`, your sample_id would be `Rush_KPC_110`.
 
 * `illumina_r1` is the name of the entire raw FASTQ file. In the same directory,  if your file is called `Rush_KPC_110_R1.fastq.gz`, your sample_id would be `Rush_KPC_110_R1.fastq.gz`. **_Only include forward reads._**
 
-You can create sample.csv file using the following for loop. Replace *path_to_your_raw_reads* below with the actual path to your raw sequencing reads.
+You can create samples.csv file using the following for loop. Replace *path_to_your_raw_reads* below with the actual path to your raw sequencing reads.
 
 ```
 
-echo "sample_id,illumina_r1" > config/sample.csv
+echo "sample_id,illumina_r1" > config/samples.csv
 
 for read1 in path_to_your_raw_reads/*_R1.fastq.gz; do
     sample_id=$(basename $read1 | sed 's/_R1.fastq.gz//g')
     read1_basename=$(basename $read1)
     echo $sample_id,$read1_basename
-done >> config/sample.csv
+done >> config/samples.csv
 
 ```
 
@@ -127,7 +225,7 @@ salloc --mem-per-cpu=10G --account=esnitkin1
 
 ```
 
-snakemake -s QCD.smk --dryrun -p
+snakemake -s workflow/QCD.smk --dryrun -p
 
 ```
 
@@ -135,20 +233,20 @@ snakemake -s QCD.smk --dryrun -p
 
 ```
 
-snakemake -s QCD.smk -p --configfile config/config.yaml --cores all
+snakemake -s workflow/QCD.smk -p --configfile config/config.yaml --cores all
 
 ```
 
->Run QCD on Great lakes HPC
+>Run QCD directly on terminal (**_note: if you close your computer/shut down terminal, the pipeline will stop running. Terminal window has to be open until pipeline runs to completion._**)
 
 ```
 
-snakemake -s QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
+snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
-> Submit QCD as a batch job. 
+> Submit QCD as a batch job (**reccommended**)
 
-Change these `SBATCH` commands: `--job-name` to a more descriptive name like run_QCD, `--mail-user` to your email address, `--time` depending on the number of samples you have (should be more than what you specified in `cluster.json`). Feel free to make changes to the other flags if you are comfortable doing so. Once you have made the necessary changes, save the below script as `run_QCD.sbat`. Don't forget to submit QCD to Slurm! `sbatch run_QCD.sbat`.
+Change these `SBATCH` commands: `--job-name` to a more descriptive name like run_QCD, `--mail-user` to your email address, `--time` depending on the number of samples you have (should be more than what you specified in `cluster.json`). Feel free to make changes to the other flags if you are comfortable doing so. Once you have made the necessary changes, save the below script as `run_QCD.sbat`. Don't forget to submit QCD to Slurm! `sbatch bash_script_to_run_QCD.sbat`.
 
 ```
 #!/bin/bash
@@ -156,11 +254,11 @@ Change these `SBATCH` commands: `--job-name` to a more descriptive name like run
 #SBATCH --job-name=QCD
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=youremail@umich.edu
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=3
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=10gb
-#SBATCH --time=06:15:00
+#SBATCH --time=12:00:00
 #SBATCH --account=esnitkin1
 #SBATCH --partition=standard
 
@@ -168,12 +266,52 @@ Change these `SBATCH` commands: `--job-name` to a more descriptive name like run
 module load Bioinformatics
 module load snakemake singularity
 
-# Run Snakemake
-snakemake -s QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
+# Extract prefix from the YAML config file
+PREFIX=$(grep '^prefix:' config/config.yaml | awk '{print $2}')
+
+# Define the file paths dynamically
+PASS_COV_FILE="results/${PREFIX}/sample_files/samples_passed_coverage.csv"
+PASS_ASSEMBLY_FILE="results/${PREFIX}/sample_files/samples_passed_assembly.csv"
+
+# Run Snakemake the first time -- until coverage
+snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
+    --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
+    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
+
+# samples_passed_coverage.csv should have been created in the Snakemake command above
+# If not found, throw an error and exit
+if [ ! -s "$PASS_COV_FILE" ] || [ "$(wc -l < "$PASS_COV_FILE")" -le 1 ]; then
+    echo "Error: $PASS_COV_FILE is missing or does not have any samples. Exiting."
+    exit 1
+else
+    echo "$PASS_COV_FILE detected. Running second part of the workflow."
+fi
+
+# Run Snakemake again to run the second part of the workflow --until assembly
+snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
+    --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
+    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
+
+# samples_passed_assembly.csv should have been created in the Snakemake command above
+# If not found, throw an error and exit
+if [ ! -s "$PASS_ASSEMBLY_FILE" ] || [ "$(wc -l < "$PASS_ASSEMBLY_FILE")" -le 1 ]; then
+    echo "Error: $PASS_ASSEMBLY_FILE is missing or does not have any samples. Exiting."
+    exit 1
+else
+    echo "$PASS_ASSEMBLY_FILE detected. Running second part of the workflow."
+fi
+
+# Run Snakemake to finish running the rest of the pipeline
+snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
+    --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
+    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
+
+# Run Snakemake for the last time to generate QC report 
+snakemake -s workflow/QCD_report.smk -p --use-singularity --cores all
 
 ```
 
-![Alt text](./QCD_dag.svg)
+![Alt text](images/QCD_dag.svg)
 <!--
 ### Gather Summary files and generate a report. 
 
@@ -199,7 +337,7 @@ snakemake -s QCD_report.smk --dryrun -p
 snakemake -s QCD_report.smk -p --use-singularity --cores 2
 
 ```
-![Alt text](./QCD_report_dag.svg)
+![Alt text](images/QCD_dag.svg)
 -->
 ## Dependencies
 
@@ -214,7 +352,7 @@ snakemake -s QCD_report.smk -p --use-singularity --cores 2
 * [fastq-scan](https://github.com/rpetit3/fastq-scan)
 * [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
 * [SPades](https://github.com/ablab/spades)
-<!--* [AMRFinderPlus](https://github.com/ncbi/amr)-->
+* [skani](https://github.com/bluenote-1577/skani)
 * [bioawk](https://github.com/lh3/bioawk)
 * [Prokka](https://github.com/tseemann/prokka)
 * [mlst](https://github.com/tseemann/mlst)
@@ -222,3 +360,5 @@ snakemake -s QCD_report.smk -p --use-singularity --cores 2
 * [MultiQC](https://multiqc.info/)
 * [Pandas](https://pandas.pydata.org/)
 * [Matplotlib](https://matplotlib.org/)
+* [BUSCO](https://busco.ezlab.org/)
+* [Fastqc](https://github.com/s-andrews/FastQC)
