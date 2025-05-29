@@ -1,0 +1,4 @@
+sample_id,illumina_r1
+MRSA_jail_100,MRSA_jail_100_R1.fastq.gz
+MRSA_jail_275,MRSA_jail_275_R1.fastq.gz
+MRSA_jail_672,MRSA_jail_672_R1.fastq.gz

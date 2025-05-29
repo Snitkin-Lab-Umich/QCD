@@ -1,0 +1,15 @@
+{
+    "__default__": 
+    {
+     "account": "esnitkin1",
+     "partition": "standard",
+     "nodes": 1,
+     "procs": 8,
+     "pmem": "10GB",
+     "walltime": "04:00:00",
+     "email": "dhatrib@umich.edu",
+     "mail_type": "FAIL",
+     "output": "logs/cluster/{rule}.{wildcards}.out",
+     "error": "logs/cluster/{rule}.{wildcards}.err"
+    }
+}
