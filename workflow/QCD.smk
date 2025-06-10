@@ -61,7 +61,7 @@ rule coverage:
         coverage = "results/{prefix}/raw_coverage/{sample}/{sample}_coverage.json",
     params:
         size = config["genome_size"]
-    singularity:
+    container:
         "docker://staphb/fastq-scan:1.0.1"
     shell:
         "zcat {input.r1} {input.r2} | fastq-scan -g {params.size} > {output.coverage}"
