@@ -12,96 +12,31 @@ jobs:
   Test-QCD-Pipeline:
     runs-on: ubuntu-latest
     steps:
-      # - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      # - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      # - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      
       - name: Checkout repository
         uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
 
-      - name: List files in the repository
-        run: |
-          ls
-      
-      - name: Get working directory
-        run: |
-          pwd
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: '3.10'
-          auto-update-conda: true
-          activate-environment: 'qcd_env_test'
-          environment-file: 'qcd_environment.yaml'
-          use-channel-priority: true
-      
-      - name: Install pip dependencies
-        run: |
-          source $CONDA/bin/activate
-          conda activate qcd_env_test
-          pip install --requirement .test/requirements.txt
-          pip install dropbox
-          pip install --upgrade tabulate
-          pip install --upgrade snakemake
-
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      
-      # - name: Install singularity
-      #   uses: eWaterCycle/setup-singularity@v7
-      #   with:
-      #     singularity-version: 3.8.3
-    
       - name: Install apptainer
         uses: eWaterCycle/setup-apptainer@v2
         with:
-          apptainer-version: 1.3.6     
+          apptainer-version: 1.3.6 
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       # Download FASTQ files from Dropbox
       - name: Download FASTQ files from Dropbox and copy it to local path
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
         run: |
-          source $CONDA/bin/activate
-          conda activate qcd_env_test
           export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
           python3 download_fastqs.py
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      
-      - name: Create necessary directories
-        run: |
-          mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/quality_raw
-          mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/trimmomatic
-          mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/raw_coverage
-          mkdir -p results/2024-12-04_Project_Test_QCD_Pipeline/spades
-          
-      # - name: SSh into Actions
-      #   uses: actions/checkout@v4
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
 
-      - name: Snakemake workflow
-        run: |
-          source $CONDA/bin/activate
-          conda activate qcd_env_test
-          snakemake -s QCD.smk -p --use-conda --use-singularity --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000 --cores 4 
-        # uses: snakemake/snakemake-github-action@v1.25.1
-        # with:
-        #   directory: '.'
-        #   snakefile: 'QCD.smk'
-        #   # install-apptainer: true
-        #   task: 'run'
-        #   # stagein: 'sudo apt-get install squashfuse fuse2fs gocryptfs'
-        #   # stagein: ./mconfig --without-suid && \
-        #   #         make -C ./builddir && \
-        #   #         make -C ./builddir install
-        #   # show-disk-usage-on-error: true
-        #   args: '--cores 4 --use-conda --use-apptainer --conda-cleanup-pkgs cache -j 999 --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000' 
-        #run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Snakemake dryrun
+        uses: snakemake/snakemake-github-action@v1.25.1
+        with:
+          directory: '.'
+          snakefile: 'workflow/QCD.smk'
+          task: 'dry-run'
+          args: '--cores 1'
