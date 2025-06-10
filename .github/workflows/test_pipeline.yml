@@ -16,11 +16,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install apptainer
-        uses: eWaterCycle/setup-apptainer@v2
+      # - name: Install apptainer
+      #   uses: eWaterCycle/setup-apptainer@v2
+      #   with:
+      #     apptainer-version: 1.3.6 
+      - name: Install singularity
+        uses: eWaterCycle/setup-singularity@v7
         with:
-          apptainer-version: 1.3.6 
-
+          singularity-version: 3.8.3
+          
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
@@ -43,4 +47,4 @@ jobs:
         with:
           directory: '.'
           snakefile: 'workflow/QCD.smk'
-          args: '--use-conda --cores 2 --use-docker --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
+          args: '--use-conda --cores 2 --use-singularity --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
