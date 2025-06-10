@@ -42,4 +42,4 @@ jobs:
         with:
           directory: '.'
           snakefile: 'workflow/QCD.smk'
-          args: '--use-conda --cores 2 --use-docker --conda-frontend conda --dryrun --configfile .test/config/config.yaml --latency-wait 1000'
+          args: '--use-conda --cores 2 --use-docker --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
