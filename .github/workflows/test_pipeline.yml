@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          
+
       - name: Install Python dependencies
         run: |
           pip install dropbox
@@ -42,5 +42,4 @@ jobs:
         with:
           directory: '.'
           snakefile: 'workflow/QCD.smk'
-          task: 'dry-run'
-          args: '--cores 1'
+          args: '--use-conda --cores 2 --use-singularity --conda-frontend mamba --dryrun --configfile .test/config/config.yaml --latency-wait 1000'
