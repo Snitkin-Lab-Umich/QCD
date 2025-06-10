@@ -52,5 +52,6 @@ jobs:
       - name: Snakemake 
         uses: snakemake/snakemake-github-action@v1.25.1
         with:
+          directory: '.'
           snakefile: 'workflow/QCD.smk'
           args: '--use-conda --cores 2 --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
