@@ -10,7 +10,8 @@ on:
 
 jobs:
   Test-QCD-Pipeline:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       # - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       # - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -24,19 +25,19 @@ jobs:
       - name: List files in the repository
         run: |
           ls
-      - name: Debug environment
-        run: |
-          uname -a
-          cat /etc/os-release
-          env
-          ls /etc/profile.d/
-          whoami
-          echo $SHELL
+      # - name: Debug environment
+      #   run: |
+      #     uname -a
+      #     cat /etc/os-release
+      #     env
+      #     ls /etc/profile.d/
+      #     whoami
+      #     echo $SHELL
 
-      - name: SSh into Actions
-        uses: actions/checkout@v4
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: SSh into Actions
+      #   uses: actions/checkout@v4
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
       - name: Get working directory and load modules
         shell: bash -l {0}
