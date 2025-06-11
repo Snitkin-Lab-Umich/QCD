@@ -8,7 +8,7 @@ short_reads: .test/data
 
 # Directory prefix where the outputs will be saved to
 # Rename this to your preferred naming convention with this format:year-month-day_Project_Name_QCD
-prefix: 2024-12-04_Project_Test_QCD_Pipeline
+prefix: 2025-06-11_Project_Test_QCD_Pipeline
 
 # Change to genome size of your organism of interest 
 genome_size: 6000000
