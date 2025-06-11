@@ -10,8 +10,8 @@ on:
 
 jobs:
   Test-QCD-Pipeline:
-    runs-on: ubuntu-latest
-    # runs-on: self-hosted
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -54,4 +54,4 @@ jobs:
         with:
           directory: '.'
           snakefile: 'workflow/QCD.smk'
-          args: '--use-conda --cores 4 --conda-cleanup-pkgs --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
+          args: '--use-conda --cores 8 --conda-cleanup-pkgs --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
