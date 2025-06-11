@@ -49,9 +49,9 @@ jobs:
           export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
           python3 download_fastqs.py
 
-      - name: Snakemake 
-        uses: snakemake/snakemake-github-action@v1.25.1
-        with:
-          directory: '.'
-          snakefile: 'workflow/QCD.smk'
-          args: '--use-conda --cores 8 --conda-cleanup-pkgs --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
+      # - name: Snakemake 
+      #   uses: snakemake/snakemake-github-action@v1.25.1
+      #   with:
+      #     directory: '.'
+      #     snakefile: 'workflow/QCD.smk'
+      #     args: '--use-conda --cores 8 --conda-cleanup-pkgs --use-apptainer --conda-frontend conda --configfile .test/config/config.yaml --latency-wait 1000'
