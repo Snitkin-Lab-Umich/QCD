@@ -57,4 +57,9 @@ coverage: 20
 # Optional to change this unless you have a skani database of your own
 skani_db: /nfs/turbo/umms-esnitkin/database/skani/gtdb_skani_database_ani
 
+# Genome size table
+# Add species of interest and genome length if it is not already there
+skani_genome_size: .test/config/species_freq.csv
+
+
 # Feel free to remove the comments after you have customized the file.
