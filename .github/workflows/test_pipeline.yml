@@ -28,7 +28,7 @@ jobs:
       - name: Get working directory and load modules
         shell: bash -l {0}
         run: |
-          source /etc/profile.d/hpc-env.sh
+          source /etc/profile.d/z11StdEnv.sh
           pwd
           module load Bioinformatics snakemake singularity
           snakemake --version
