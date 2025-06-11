@@ -24,7 +24,20 @@ jobs:
       - name: List files in the repository
         run: |
           ls
-      
+      - name: Debug environment
+        run: |
+          uname -a
+          cat /etc/os-release
+          env
+          ls /etc/profile.d/
+          whoami
+          echo $SHELL
+
+      - name: SSh into Actions
+        uses: actions/checkout@v4
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Get working directory and load modules
         shell: bash -l {0}
         run: |
