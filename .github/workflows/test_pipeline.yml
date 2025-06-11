@@ -26,6 +26,7 @@ jobs:
           ls
       
       - name: Get working directory and load modules
+        shell: bash -l {0}
         run: |
           source /etc/profile.d/hpc-env.sh
           pwd
