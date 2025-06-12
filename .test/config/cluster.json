@@ -4,7 +4,7 @@
      "account": "esnitkin1",
      "partition": "standard",
      "nodes": 1,
-     "procs": 8,
+     "procs": 6,
      "pmem": "10GB",
      "walltime": "02:00:00",
      "email": "dhatrib@umich.edu",
