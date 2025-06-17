@@ -40,23 +40,24 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
 
       # Download FASTQ files from Dropbox
-      - name: Download FASTQ files from Dropbox and copy it to local path
-        env:
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        run: |
-          source /etc/profile.d/z11StdEnv.sh
-          module load Bioinformatics snakemake singularity
-          export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
-          python3 download_fastqs.py
+      # - name: Download FASTQ files from Dropbox and copy it to local path
+      #   env:
+      #     DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+      #   run: |
+      #     source /etc/profile.d/z11StdEnv.sh
+      #     module load Bioinformatics snakemake singularity
+      #     export DROPBOX_ACCESS_TOKEN=${DROPBOX_ACCESS_TOKEN}
+      #     python3 download_fastqs.py
 
       - name: Load modules and run the pipeline
         shell: bash -l {0}
         run: |
           source /etc/profile.d/z11StdEnv.sh
           module load Bioinformatics snakemake singularity
-          snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
-          snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
-          snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
-          snakemake -s workflow/QCD_report.smk -p --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --latency-wait 1000 --nolock
+          snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --cores all
+          # snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
+          # snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
+          # snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --configfile .test/config/config.yaml --latency-wait 1000 --nolock
+          # snakemake -s workflow/QCD_report.smk -p --use-singularity -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem}" --conda-frontend conda --cluster-config .test/config/cluster.json --latency-wait 1000 --nolock
       
      
