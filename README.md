@@ -259,3 +259,4 @@ snakemake -s QCD_report.smk -p --use-singularity --cores 2
 * [Matplotlib](https://matplotlib.org/)
 * [BUSCO](https://busco.ezlab.org/)
 * [Fastqc](https://github.com/s-andrews/FastQC)
+
