@@ -1,5 +1,3 @@
-![QCD Pipeline](https://github.com/Snitkin-Lab-Umich/QCD/actions/workflows/test_pipeline.yml/badge.svg)
-
 # QCD - Quality Control and Contamination Detection workflow.
 
 QCD is a workflow for microbial Illumina sequencing quality control and contamination detection implemented in Snakemake.
@@ -155,11 +153,6 @@ Reduce the walltime (to ~6 hours) in `config/cluster.json` to ensure the jobs ar
 
 ## Quick start
 
->  Start an interactive session before you run the pipeline. 
-
-```
-salloc --mem-per-cpu=10G --account=esnitkin1
-```
 
 ### Run QCD on a set of samples.
 
@@ -167,7 +160,7 @@ salloc --mem-per-cpu=10G --account=esnitkin1
 
 ```
 
-snakemake -s workflow/QCD.smk --dryrun -p
+snakemake -s workflow/Snakefile --dryrun 
 
 ```
 
@@ -175,7 +168,7 @@ snakemake -s workflow/QCD.smk --dryrun -p
 
 ```
 
-snakemake -s workflow/QCD.smk -p --configfile config/config.yaml --cores all
+snakemake -s workflow/Snakefile -p --use-conda --use-singularity --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --cores all
 
 ```
 
@@ -183,7 +176,7 @@ snakemake -s workflow/QCD.smk -p --configfile config/config.yaml --cores all
 
 ```
 
-snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
+snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
 > Submit QCD as a batch job (**reccommended**)
@@ -208,48 +201,10 @@ Change these `SBATCH` commands: `--job-name` to a more descriptive name like run
 module load Bioinformatics
 module load snakemake singularity
 
-# Extract prefix from the YAML config file
-PREFIX=$(grep '^prefix:' config/config.yaml | awk '{print $2}')
-
-# Define the file paths dynamically
-PASS_COV_FILE="results/${PREFIX}/sample_files/samples_passed_coverage.csv"
-PASS_ASSEMBLY_FILE="results/${PREFIX}/sample_files/samples_passed_assembly.csv"
-
-# Run Snakemake the first time -- until coverage
-snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
+# Run Snakemake pipeline
+snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules -j 999 \
     --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
     --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
-
-# samples_passed_coverage.csv should have been created in the Snakemake command above
-# If not found, throw an error and exit
-if [ ! -s "$PASS_COV_FILE" ] || [ "$(wc -l < "$PASS_COV_FILE")" -le 1 ]; then
-    echo "Error: $PASS_COV_FILE is missing or does not have any samples. Exiting."
-    exit 1
-else
-    echo "$PASS_COV_FILE detected. Running second part of the workflow."
-fi
-
-# Run Snakemake again to run the second part of the workflow --until assembly
-snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
-    --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
-    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
-
-# samples_passed_assembly.csv should have been created in the Snakemake command above
-# If not found, throw an error and exit
-if [ ! -s "$PASS_ASSEMBLY_FILE" ] || [ "$(wc -l < "$PASS_ASSEMBLY_FILE")" -le 1 ]; then
-    echo "Error: $PASS_ASSEMBLY_FILE is missing or does not have any samples. Exiting."
-    exit 1
-else
-    echo "$PASS_ASSEMBLY_FILE detected. Running second part of the workflow."
-fi
-
-# Run Snakemake to finish running the rest of the pipeline
-snakemake -s workflow/QCD.smk -p --use-conda --use-singularity --use-envmodules -j 999 \
-    --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
-    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
-
-# Run Snakemake for the last time to generate QC report 
-snakemake -s workflow/QCD_report.smk -p --use-singularity --cores all
 
 ```
 
