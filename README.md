@@ -169,7 +169,7 @@ snakemake -s workflow/Snakefile --dryrun
 
 ```
 
-snakemake -s workflow/Snakefile -p --use-conda --use-singularity --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --cores all
+snakemake -s workflow/Snakefile -p --use-conda --use-singularity --conda-frontend mamba --configfile config/config.yaml --latency-wait 1000 --nolock --cores all
 
 ```
 
@@ -177,7 +177,7 @@ snakemake -s workflow/Snakefile -p --use-conda --use-singularity --conda-fronten
 
 ```
 
-snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
+snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules -j 999 --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes}  -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" --conda-frontend mamba --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock
 
 ```
 > Submit QCD as a batch job (**reccommended**)
@@ -205,7 +205,7 @@ module load snakemake singularity
 # Run Snakemake pipeline
 snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules -j 999 \
     --cluster "sbatch -A {cluster.account} -p {cluster.partition} -N {cluster.nodes} -t {cluster.walltime} -c {cluster.procs} --mem-per-cpu {cluster.pmem} --output=slurm_out/slurm-%j.out" \
-    --conda-frontend conda --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
+    --conda-frontend mamba --cluster-config config/cluster.json --configfile config/config.yaml --latency-wait 1000 --nolock 
 
 ```
 
