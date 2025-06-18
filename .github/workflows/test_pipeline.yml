@@ -1,12 +1,20 @@
 name: Test QCD Pipeline
 run-name: ${{ github.actor }} is testing snakemake workflow 🚀
+
 on:
   push:
     branches:
-      - main
+      - dev  # Only run pipeline on dev branch commits
   pull_request:
     branches:
-      - main
+      - main  # Also run the same tests on PRs targeting main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
 jobs:
   Test-QCD-Pipeline:
