@@ -16,35 +16,6 @@ PREFIX = config["prefix"]
 
 SHORT_READS_DIR = config["short_reads"]
 
-# Organize reports directory
-prefix = PREFIX
-outdir = "results/%s" % prefix
-report_dir = outdir + "/%s_Report" % prefix
-report_script_dir = report_dir + "/scripts"
-report_data_dir = report_dir + "/data"
-report_multiqc_dir = report_dir + "/multiqc"
-report_fig_dir = report_dir + "/fig"
-
-isExist = os.path.exists(report_dir)
-if not isExist:
-    os.makedirs(report_dir)
-
-isExist = os.path.exists(report_script_dir)
-if not isExist:
-    os.makedirs(report_script_dir)
-
-isExist = os.path.exists(report_data_dir)
-if not isExist:
-    os.makedirs(report_data_dir)
-
-isExist = os.path.exists(report_multiqc_dir)
-if not isExist:
-    os.makedirs(report_multiqc_dir)
-
-isExist = os.path.exists(report_fig_dir)
-if not isExist:
-    os.makedirs(report_fig_dir)
-
 def samples_that_passed_coverage(wildcards=None, return_samples_only=False):
     # Get the output file from the checkpoint
     summary_csv = checkpoints.summarize_coverage.get(prefix=PREFIX).output[0]
@@ -79,10 +50,6 @@ rule all:
     input:
         samples_that_passed_assembly,
         samples_that_passed_coverage,
-        # coverage_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Final_Coverage.txt", prefix=PREFIX),
-        # skani_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_Skani_report_final.csv", prefix=PREFIX),
-        # multiqc_report = expand("results/{prefix}/{prefix}_Report/multiqc/{prefix}_QC_report.html", prefix=PREFIX),
-        # mlst_report = expand("results/{prefix}/{prefix}_Report/data/{prefix}_MLST_results.csv", prefix=PREFIX),
         QC_summary = expand("results/{prefix}/{prefix}_Report/data/{prefix}_QC_summary.csv", prefix=PREFIX),
 
 ####### rules #################
