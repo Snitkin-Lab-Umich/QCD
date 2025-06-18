@@ -50,9 +50,9 @@ jobs:
       #     python3 download_fastqs.py
 
       - name: Load modules and run the pipeline
-        shell: bash -l {0}
+        # shell: bash -l {0}
         run: |
           source /etc/profile.d/z11StdEnv.sh
           module load Bioinformatics snakemake singularity
-          snakemake -s workflow/Snakefile --dryrun
-          # snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --cores all
+          # snakemake -s workflow/Snakefile --dryrun
+          snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --conda-prefix /nfs/turbo/umms-esnitkin/Github/self_hosted_runner/conda_envs --singularity-prefix /nfs/turbo/umms-esnitkin/Github/self_hosted_runner/singularity_images --cores all
