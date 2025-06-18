@@ -56,3 +56,9 @@ jobs:
           module load Bioinformatics snakemake singularity
           # snakemake -s workflow/Snakefile --dryrun
           snakemake -s workflow/Snakefile -p --use-conda --use-singularity --use-envmodules --conda-frontend conda --configfile config/config.yaml --latency-wait 1000 --nolock --conda-prefix /nfs/turbo/umms-esnitkin/Github/self_hosted_runner/conda_envs --singularity-prefix /nfs/turbo/umms-esnitkin/Github/self_hosted_runner/singularity_images --cores all
+
+      - name: Run unit tests
+        run: |
+          source /etc/profile.d/z11StdEnv.sh
+          module load python3.10-anaconda/2023.03
+          pytest .test/test_pipeline_outputs.py
