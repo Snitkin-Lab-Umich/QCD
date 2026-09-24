@@ -11,7 +11,7 @@ rule busco:
     #conda:
     #    "envs/busco.yaml"
     singularity:
-        "docker://staphb/busco:5.7.1-prok-bacteria_odb10_2024-01-08"
+        "docker://staphb/busco:6.0.0-prok-bacteria_odb12_2024-11-14"
     #envmodules:
     #    "Bioinformatics",
     #    "busco"
