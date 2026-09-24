@@ -9,7 +9,7 @@ rule quast:
     #conda:
     #    "envs/quast.yaml"
     singularity:
-        "docker://staphb/quast:5.0.2"
+        "docker://staphb/quast:5.3.0"
     #envmodules:
     #    "Bioinformatics",
     #    "quast"
