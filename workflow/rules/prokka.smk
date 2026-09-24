@@ -10,7 +10,7 @@ rule prokka:
     #conda:
     #    "envs/prokka.yaml"
     singularity:
-        "docker://staphb/prokka:1.14.6"
+        "docker://staphb/prokka:1.15.6"
     #envmodules:
     #    "Bioinformatics",
     #    "prokka"
