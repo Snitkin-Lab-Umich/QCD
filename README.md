@@ -10,10 +10,10 @@ As part of the SOP in the [Snitkin lab](https://thesnitkinlab.com/index.php), th
 In short, it performs the following steps:
 
 * [Fastqc](https://github.com/s-andrews/FastQC)(v0.12.1) is used to generate HTML reports to asses quality of sequencing reads before and after trimming reads. 
-* Trims and filters low-quality bases and adapter sequences from raw FASTQ reads using [Trimmomatic](https://github.com/usadellab/Trimmomatic)(v0.39).
+* Trims and filters low-quality bases and adapter sequences from raw FASTQ reads using [Trimmomatic](https://github.com/usadellab/Trimmomatic)(v0.41).
 * [fastq-scan](https://github.com/rpetit3/fastq-scan)(v1.0.1) is used to estimate genome coverage of FASTQ files.
-* Assembles trimmed reads into contigs using [SPAdes](https://github.com/ablab/spades)(v4.1.0).
-* The assembled contigs from [SPAdes](https://github.com/ablab/spades) is then passed through [Prokka](https://github.com/tseemann/prokka)(v1.14.6) for annotation, [QUAST](https://quast.sourceforge.net/)(v5.0.2) for assembly statistics, [MLST](https://github.com/tseemann/mlst)(v2.23.0) for determining sequence type based on sequences of housekeeping genes, [skani](https://github.com/bluenote-1577/skani)(v0.2.1) to identify closest reference genome and [BUSCO](https://busco.ezlab.org/)(v5.7.1) for assembly completeness statistics.
+* Assembles trimmed reads into contigs using [SPAdes](https://github.com/ablab/spades)(v4.3.0).
+* The assembled contigs from [SPAdes](https://github.com/ablab/spades) is then passed through [Prokka](https://github.com/tseemann/prokka)(v1.15.6) for annotation, [QUAST](https://quast.sourceforge.net/)(v5.3.0) for assembly statistics, [MLST](https://github.com/tseemann/mlst)(v2.23.0) for determining sequence type based on sequences of housekeeping genes, [skani](https://github.com/bluenote-1577/skani)(v0.3.2) to identify closest reference genome and [BUSCO](https://busco.ezlab.org/)(v6.0.0) for assembly completeness statistics.
 * [Multiqc](https://github.com/MultiQC/MultiQC)(v1.19) aggregates the final outputs from [Fastqc](https://github.com/s-andrews/FastQC), [Prokka](https://github.com/tseemann/prokka) and [QUAST](https://quast.sourceforge.net/) to produce a HTML report.
 * The final step in the pipeline is to generate a QC report that will specify which samples have passed or failed the pipeline.
 
