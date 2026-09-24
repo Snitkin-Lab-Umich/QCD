@@ -27,7 +27,7 @@ rule trimmomatic_pe:
     #conda:
     #    "envs/trimmomatic.yaml"
     singularity:
-        "docker://staphb/trimmomatic:0.39"
+        "docker://staphb/trimmomatic:0.41"
     #envmodules:
     #    "Bioinformatics",
     #    "trimmomatic"
